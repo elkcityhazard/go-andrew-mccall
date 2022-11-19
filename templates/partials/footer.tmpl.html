@@ -1,29 +1,50 @@
-{{ define "footer"  }}
+{{ define "footer" }}
 
 
 <footer class="main-footer">
     <div class="container">
         <div class="row">
             <section class="footer-section">
-                <p>Lorem ipsum dolor sit, amet consectetur adipisicing elit. Ipsam dolor eligendi sint quas laudantium magnam unde voluptatem quia dignissimos ex.</p>
+                {{ with .DefaultTemplateData.SiteTitle }}
+                    <h3 class="text-center">{{ . }}</h3>
+                {{ end }}
             </section>
         </div>
         <div class="row">
-            <section class="footer-section">
-            
+            <section class="footer-section logo text-left">
+                <h4>Traverse City Web Design Services</h4>
+                <p class="text-left">We specialize in custom backend web development and enterprise web applications.</p>
+                <p class="text-left">We are currently not accepting Wordpress or website maintenance work.  Thank you for understanding.</p>
             </section>
             <section class="footer-section">
-                
+                <h4>Navigation Menu</h4>
+                {{ template "navigation" . }}
             </section>
             <section class="footer-section">
-                
+                <h4>Address</h4>
+
+                {{ with .DefaultTemplateData.Nap }}
+                <address>
+                    <ul>
+                        <li>{{.Name }}</li>
+                        <li><a href="{{.PhoneHref}}" class="phone">{{ .Phone }}</a></li>
+                        <li>{{ .Street }} <br /> {{ .City }}, {{ .State }} {{ .ZipCode}} </li>
+                    </ul>
+                </address>
+                {{ end }}
             </section>
             <section class="footer-section">
                <h4>Social Media</h4>
                {{ with .DefaultTemplateData.SocialMedia }}
-                {{ range . }}
-                    {{ .twitter }}
-                {{ end }}
+                <ul class="social-list__group">
+                    {{ range . }}
+                        <li class="social-list__item">
+                            <a href="{{.Url }}" class="social-list__link" title="social media - {{ .Name }}" rel="noreferrer noopenner nofollow">
+                                <img src="{{.FilePath }}" alt="social link - {{ .Name }}" class="social_list__image" height="30" width="30" decoding="async" loading="lazy">
+                            </a>
+                        </li>
+                    {{ end }}
+                </ul>
                {{ end }}
             </section>
         </div>

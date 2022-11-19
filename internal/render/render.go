@@ -5,13 +5,10 @@ import (
 	"errors"
 	"fmt"
 	"html/template"
-	"io/ioutil"
-	"log"
 	"net/http"
 	"path/filepath"
 
 	"github.com/elkcityhazard/go-andrew-mccall/internal/models"
-	"gopkg.in/yaml.v2"
 )
 
 var myFuncMap template.FuncMap
@@ -23,37 +20,6 @@ func NewRenderer(a *models.AppConfig) {
 }
 
 func AddDefaultTemplateData() models.DefaultTemplateData {
-
-	file, err := ioutil.ReadFile("./config.yaml")
-
-	if err != nil {
-		log.Fatalln(err)
-	}
-
-	data := make(map[interface{}]interface{})
-
-	err = yaml.Unmarshal(file, &data)
-
-	if err != nil {
-
-		log.Fatal(err)
-	}
-
-	socialMedia := make(map[string]interface{})
-
-	for i, v := range data {
-
-		strKey := fmt.Sprintf("%v", i)
-		strVal := fmt.Sprintf("%v", v)
-		socialMedia[strKey] = strVal
-
-	}
-
-	for _, v := range socialMedia {
-		for _, x := range v.(map[string]interface{}) {
-			fmt.Println(x)
-		}
-	}
 
 	td := models.DefaultTemplateData{
 		Navigation: []models.Navigation{
@@ -68,8 +34,12 @@ func AddDefaultTemplateData() models.DefaultTemplateData {
 				Weight: 3,
 			},
 		},
-		SocialMedia: socialMedia,
 	}
+
+	td.SiteTitle = "Andrew McCall - Traverse City Web Design"
+	td.SocialMedia = td.AddSocial()
+	td.Nap = td.AddNap()
+
 	return td
 }
 
@@ -107,6 +77,7 @@ func RenderTemplate(w http.ResponseWriter, r *http.Request, tmpl string, td *mod
 	err := t.Execute(buf, td)
 
 	if err != nil {
+		fmt.Println(err)
 		return err
 	}
 
