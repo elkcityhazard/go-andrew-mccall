@@ -4,10 +4,14 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
-	"github.com/elkcityhazard/go-andrew-mccall/internal/models"
 	"html/template"
+	"io/ioutil"
+	"log"
 	"net/http"
 	"path/filepath"
+
+	"github.com/elkcityhazard/go-andrew-mccall/internal/models"
+	"gopkg.in/yaml.v2"
 )
 
 var myFuncMap template.FuncMap
@@ -16,6 +20,57 @@ var app *models.AppConfig
 
 func NewRenderer(a *models.AppConfig) {
 	app = a
+}
+
+func AddDefaultTemplateData() models.DefaultTemplateData {
+
+	file, err := ioutil.ReadFile("./config.yaml")
+
+	if err != nil {
+		log.Fatalln(err)
+	}
+
+	data := make(map[interface{}]interface{})
+
+	err = yaml.Unmarshal(file, &data)
+
+	if err != nil {
+
+		log.Fatal(err)
+	}
+
+	socialMedia := make(map[string]interface{})
+
+	for i, v := range data {
+
+		strKey := fmt.Sprintf("%v", i)
+		strVal := fmt.Sprintf("%v", v)
+		socialMedia[strKey] = strVal
+
+	}
+
+	for _, v := range socialMedia {
+		for _, x := range v.(map[string]interface{}) {
+			fmt.Println(x)
+		}
+	}
+
+	td := models.DefaultTemplateData{
+		Navigation: []models.Navigation{
+			{
+				Name:   "About",
+				URL:    "/about",
+				Weight: 2,
+			},
+			{
+				Name:   "Blog",
+				URL:    "/blog",
+				Weight: 3,
+			},
+		},
+		SocialMedia: socialMedia,
+	}
+	return td
 }
 
 func RenderTemplate(w http.ResponseWriter, r *http.Request, tmpl string, td *models.TemplateData) error {
@@ -42,6 +97,8 @@ func RenderTemplate(w http.ResponseWriter, r *http.Request, tmpl string, td *mod
 		err := errors.New("error parsing the template set")
 		return err
 	}
+
+	td.DefaultTemplateData = AddDefaultTemplateData()
 
 	// need buf to write to first to ensure everything goes okay
 

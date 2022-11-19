@@ -2,9 +2,10 @@ package handlers
 
 import (
 	"fmt"
+	"net/http"
+
 	"github.com/elkcityhazard/go-andrew-mccall/internal/models"
 	"github.com/elkcityhazard/go-andrew-mccall/internal/render"
-	"net/http"
 )
 
 type Repository struct {
@@ -30,6 +31,10 @@ func SetRepo(m *Repository) {
 }
 
 func (m *Repository) Home(w http.ResponseWriter, r *http.Request) {
+
+	pathKey := r.URL.Path[len("/"):]
+
+	fmt.Println(pathKey)
 
 	fmt.Println("is this working?")
 

@@ -1,0 +1,33 @@
+{{ define "footer"  }}
+
+
+<footer class="main-footer">
+    <div class="container">
+        <div class="row">
+            <section class="footer-section">
+                <p>Lorem ipsum dolor sit, amet consectetur adipisicing elit. Ipsam dolor eligendi sint quas laudantium magnam unde voluptatem quia dignissimos ex.</p>
+            </section>
+        </div>
+        <div class="row">
+            <section class="footer-section">
+            
+            </section>
+            <section class="footer-section">
+                
+            </section>
+            <section class="footer-section">
+                
+            </section>
+            <section class="footer-section">
+               <h4>Social Media</h4>
+               {{ with .DefaultTemplateData.SocialMedia }}
+                {{ range . }}
+                    {{ .twitter }}
+                {{ end }}
+               {{ end }}
+            </section>
+        </div>
+    </div>
+</footer>
+
+{{ end }}

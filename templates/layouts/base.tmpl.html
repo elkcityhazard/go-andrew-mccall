@@ -10,6 +10,7 @@
 </head>
 <body>
 <div class="wrapper">
+    {{ template "navigation" . }}
     <main class="main-content">
         {{ template "Content" . }}
     </main>
@@ -17,7 +18,7 @@
         {{ template "aside" . }}
     </aside>
 </div>
-
+{{ template "footer" . }}
 </body>
 </html>
 

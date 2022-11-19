@@ -1,0 +1,12 @@
+{{ define "navigation" }}
+
+{{ with .DefaultTemplateData.Navigation }}
+<nav class="main-nav">
+    {{ range . }}
+<a href="{{ .URL }}" title="{{ .Name }}">{{ .Name }}</a>
+    {{ end }}
+</nav>
+
+{{ end }}
+
+{{ end }}
