@@ -1,0 +1,64 @@
+{{ template "base" .}}
+
+{{ define "title" }}
+
+{{ end }}
+
+
+{{ define "Content" }}
+
+<div class="container">
+    <div class="row">
+        <form action="/admin/add-post" method="POST" class="add-post" enctype="multipart/form-data">
+            <div class="form-control">
+                <label for="title">Title: </label>
+                <input type="text" name="title" id="postTitle">
+            </div>
+            <div class="form-control">
+                <label for="publishDate">Publish Date: </label>
+                <input type="date" name="publishDate" id="postPublishDate">
+            </div>
+            <div class="form-control">
+                <label for="updateDate">Updated On: </label>
+                <input type="date" name="updateDate" id="postUpdateDate">
+            </div>
+            <div class="form-control">
+                <label for="expireDate">Expires On: </label>
+                <input type="date" name="expireDate" id="postExpireDate">
+            </div>
+            <div class="form-control">
+                <label for="description">Meta Description: </label>
+                <input type="text" name="description" id="postDescription">
+            </div>
+            <div class="form-control">
+                <label for="summary">Summary: </label>
+                <input type="text" name="summary" id="postSummary">
+            </div>
+            <div class="form-control">
+                <label for="featuredImage">Featured Image: </label>
+                <input type="file" name="featuredImage" id="postFeaturedImage">
+            </div>
+            <div class="form-control">
+                <label for="tags">Tags: </label>
+                <input type="text" name="tags" id="postTags">
+            </div>
+            <div class="form-control">
+                <label for="categories">Categories: </label>
+                <input type="text" name="categories" id="postCategories">
+            </div>
+            <div class="form-control">
+                <label for="content">Content: </label>
+                <textarea name="content" id="postContent" cols="30" rows="10">Enter Post Content</textarea>
+            </div>
+            <div class="form-control">
+                <input type="submit" value="Submit">
+            </div>
+        </form>
+    </div>
+</div>
+
+{{ end }}
+
+{{ define "aside" }}
+
+{{ end }}

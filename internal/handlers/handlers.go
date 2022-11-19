@@ -40,3 +40,20 @@ func (m *Repository) Home(w http.ResponseWriter, r *http.Request) {
 
 	render.RenderTemplate(w, r, "home.tmpl.html", &models.TemplateData{})
 }
+
+func (m *Repository) AddPost(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Allow", "POST, GET")
+	switch r.Method {
+	case "GET":
+		render.RenderTemplate(w, r, "create-post.tmpl.html", &models.TemplateData{})
+	case "POST":
+		err := r.ParseMultipartForm(2 << 20)
+
+		if err != nil {
+			http.Error(w, fmt.Sprintf("%s", err), http.StatusInternalServerError)
+			return
+		}
+
+		fmt.Println(r.Form)
+	}
+}

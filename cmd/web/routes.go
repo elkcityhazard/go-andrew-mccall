@@ -14,5 +14,7 @@ func routes() *http.ServeMux {
 
 	mux.HandleFunc("/", handlers.Repo.Home)
 
+	mux.HandleFunc("/admin/add-post", handlers.Repo.AddPost)
+
 	return mux
 }
