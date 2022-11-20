@@ -1,6 +1,9 @@
 package models
 
-import "time"
+import (
+	"fmt"
+	"time"
+)
 
 type Post struct {
 	Title         string
@@ -17,7 +20,18 @@ type Post struct {
 
 func (p *Post) InsertIntoDB(app *AppConfig) {
 
-	stmt := `INSERT INTO posts VALUES(
-		
-	 )`
+	stmt := `INSERT INTO posts (title, 
+                   description, 
+                   summary, 
+                   publish_date, 
+                   update_date, 
+                   expire_date, 
+                   featured_image, 
+                   content, 
+                   user_id)
+				   VALUES(?,?,?,?,?,?,?,?,?);
+			`
+
+	fmt.Println(stmt)
+
 }
