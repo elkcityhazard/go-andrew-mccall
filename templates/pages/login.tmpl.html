@@ -1,0 +1,25 @@
+{{ template "base" . }}
+
+{{ define "title" }}
+Login
+{{ end }}
+
+{{ define "Content" }}
+
+<form action="/login" method="post" class="login-form">
+    <div class="form-control">
+        <label for="email">Input: <input type="text" name="email" id="user_email"></label>
+    </div>
+    <div class="form-control">
+        <label for="password">Password: <input type="password" name="password" id="user_password"></label>
+    </div>
+    <div class="form-control">
+        <label for="submit"><input type="submit" value="submit"></label>
+    </div>
+</form>
+
+{{ end }}
+
+{{ define "aside" }}
+
+{{ end }}

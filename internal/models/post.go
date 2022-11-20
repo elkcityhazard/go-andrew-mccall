@@ -1,6 +1,7 @@
 package models
 
 import (
+	"database/sql"
 	"fmt"
 	"time"
 )
@@ -16,9 +17,10 @@ type Post struct {
 	Categories    []string
 	FeaturedImage string
 	Content       string
+	UserID        int
 }
 
-func (p *Post) InsertIntoDB(app *AppConfig) {
+func (p *Post) InsertIntoDB(db *sql.DB) {
 
 	stmt := `INSERT INTO posts (title, 
                    description, 
@@ -32,6 +34,6 @@ func (p *Post) InsertIntoDB(app *AppConfig) {
 				   VALUES(?,?,?,?,?,?,?,?,?);
 			`
 
-	fmt.Println(stmt)
+	fmt.Println(stmt, p.Title, p.Description, p.Summary, p.PublishDate, p.UpdatedDate, p.ExpireDate, p.FeaturedImage, p.Content, p.UserID)
 
 }

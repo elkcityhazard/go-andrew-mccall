@@ -6,7 +6,7 @@ import (
 	"github.com/elkcityhazard/go-andrew-mccall/internal/handlers"
 )
 
-func routes() *http.ServeMux {
+func routes() http.Handler {
 	mux := http.NewServeMux()
 
 	fs := http.FileServer(http.Dir("./static"))
@@ -14,7 +14,9 @@ func routes() *http.ServeMux {
 
 	mux.HandleFunc("/", handlers.Repo.Home)
 
+	mux.HandleFunc("/admin/login", handlers.Repo.Login)
 	mux.HandleFunc("/admin/add-post", handlers.Repo.AddPost)
+	mux.HandleFunc("/admin/get-jwt", handlers.Repo.GetJWT)
 
-	return mux
+	return CheckForAPIKey(mux)
 }
