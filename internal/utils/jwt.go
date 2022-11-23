@@ -1,6 +1,8 @@
 package utils
 
 import (
+	"errors"
+	"fmt"
 	"net/http"
 	"time"
 
@@ -10,21 +12,22 @@ import (
 
 var app *models.AppConfig
 
-var secret = []byte(app.JWTSecret)
-
 func NewUtils(a *models.AppConfig) {
 	app = a
 }
 
-func CreateToken() (string, error) {
+//var secret = []byte(app.JWTSecret)
+
+func CreateToken(id string) (string, error) {
 
 	token := jwt.New(jwt.SigningMethodHS256)
 
 	claims := token.Claims.(jwt.MapClaims)
 
-	claims["expiration"] = time.Now().Add(time.Hour).Unix()
+	claims["expiration"] = time.Now().Add(time.Minute).Unix()
+	claims["id"] = id
 
-	tokenString, err := token.SignedString(secret)
+	tokenString, err := token.SignedString([]byte(app.JWTSecret))
 
 	if err != nil {
 		return "", err
@@ -37,15 +40,28 @@ func CreateToken() (string, error) {
 
 func ValidateJWT(next func(w http.ResponseWriter, r *http.Request)) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if r.Header["token"] != nil {
-			token, err := jwt.Parse(r.Header["token"][0], func(t *jwt.Token) (interface{}, error) {
+
+		cookieToken, err := r.Cookie("Token")
+
+		if err != nil {
+			http.Redirect(w, r, "/admin/login", http.StatusSeeOther)
+			return
+		}
+
+		if cookieToken == nil {
+			http.Error(w, fmt.Sprintf("%s", errors.New("no token provided")), http.StatusBadRequest)
+			return
+		}
+
+		if r.Header["Token"] != nil {
+			token, err := jwt.Parse(r.Header["Token"][0], func(t *jwt.Token) (interface{}, error) {
 				_, ok := t.Method.(*jwt.SigningMethodHMAC)
 
 				if !ok {
 					w.WriteHeader(http.StatusUnauthorized)
 					w.Write([]byte("not authorized"))
 				}
-				return secret, nil
+				return app.JWTSecret, nil
 			})
 			if err != nil {
 				w.WriteHeader(http.StatusUnauthorized)

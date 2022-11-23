@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"html"
 	"net/http"
+	"strconv"
 	"time"
 
 	"github.com/elkcityhazard/go-andrew-mccall/internal/models"
@@ -43,6 +44,44 @@ func (m *Repository) Home(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("is this working?")
 
 	render.RenderTemplate(w, r, "home.tmpl.html", &models.TemplateData{})
+}
+
+func (m *Repository) Login(w http.ResponseWriter, r *http.Request) {
+
+	switch r.Method {
+	case "GET":
+		render.RenderTemplate(w, r, "signup.tmpl.html", &models.TemplateData{})
+	case "POST":
+		err := r.ParseForm()
+
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+
+		email := r.Form.Get("email")
+		password := r.Form.Get("password")
+
+		u := models.User{}
+
+		user, err := u.GetUserByEmail(m.AppConfig.DB, email)
+
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+
+		err = bcrypt.CompareHashAndPassword(user.Password, []byte(password))
+
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+
+		m.GetJWT(w, r)
+
+	}
+
 }
 
 func (m *Repository) AddPost(w http.ResponseWriter, r *http.Request) {
@@ -90,24 +129,71 @@ func (m *Repository) AddPost(w http.ResponseWriter, r *http.Request) {
 
 //	Loging handles displaying the login page and posting the login
 
-func (m *Repository) Login(w http.ResponseWriter, r *http.Request) {
+func (m *Repository) Signup(w http.ResponseWriter, r *http.Request) {
 
 	switch r.Method {
 	case "GET":
 
-		render.RenderTemplate(w, r, "login.tmpl.html", &models.TemplateData{})
+		w.Header().Set("Api", app.APIKey)
+		render.RenderTemplate(w, r, "signup.tmpl.html", &models.TemplateData{})
 
 	case "POST":
+		err := r.ParseForm()
 
+		r.Header.Set("Api", app.APIKey)
+
+		if err != nil {
+			http.Error(w, fmt.Sprintf("%s", err), http.StatusInternalServerError)
+			return
+		}
+
+		email := html.EscapeString(r.Form.Get("email"))
+		password := html.EscapeString(r.Form.Get("password"))
+
+		encrpytedPassword, err := bcrypt.GenerateFromPassword([]byte(password), 10)
+
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+
+		u := models.User{}
+
+		u.Email = email
+		u.Password = encrpytedPassword
+
+		_, err = u.InsertIntoDB(m.AppConfig.DB)
+
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+
+		InsertedUser, err := u.GetUserByEmail(app.DB, u.Email)
+
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+
+		idCookie := &http.Cookie{
+			Name:     "Id",
+			Value:    strconv.Itoa(InsertedUser.Id),
+			HttpOnly: true,
+			MaxAge:   60,
+		}
+
+		http.SetCookie(w, idCookie)
+
+		http.Redirect(w, r, "/admin/get-jwt", http.StatusSeeOther)
 	default:
+		fmt.Println("default")
 	}
 }
 
 // CreateUser Creates A New User
 
 func (m *Repository) AddUser(w http.ResponseWriter, r *http.Request) {
-
-	// stmt := `INSERT INTO users (email, password) VALUES(?,?);`
 
 	err := r.ParseForm()
 
@@ -131,17 +217,46 @@ func (m *Repository) AddUser(w http.ResponseWriter, r *http.Request) {
 	u.Email = email
 	u.Password = encrpytedPassword
 
-	u.InsertIntoDB(m.AppConfig.DB)
+	result, err := u.InsertIntoDB(m.AppConfig.DB)
+
+	if err != nil {
+		http.Error(w, fmt.Sprintf("%s", err), http.StatusInternalServerError)
+		return
+	}
+
+	fmt.Println("Result: ", result)
+
+	http.Redirect(w, r, "/admin/get-jwt", http.StatusSeeOther)
 
 }
 
 func (m *Repository) GetJWT(w http.ResponseWriter, r *http.Request) {
-	token, err := utils.CreateToken()
+
+	idToken, err := r.Cookie("Id")
+
+	v := idToken.Value
+
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
+
+	token, err := utils.CreateToken(v)
 
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
+
+	tokenCookie := &http.Cookie{
+		Name:     "Token",
+		Value:    token,
+		HttpOnly: true,
+		MaxAge:   3600,
+	}
+
+	http.SetCookie(w, tokenCookie)
+
+	w.Header().Add("Token", tokenCookie.Value)
 
 	_, err = fmt.Fprint(w, token)
 

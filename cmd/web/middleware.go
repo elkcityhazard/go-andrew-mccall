@@ -6,12 +6,27 @@ import (
 	"github.com/elkcityhazard/go-andrew-mccall/internal/utils"
 )
 
-func CheckForAPIKey(next http.Handler) http.Handler {
+func SetAPIKey(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		r.Header.Set("Api", app.APIKey)
+		next.ServeHTTP(w, r)
+	})
+}
 
+func CheckForAPIKey(next http.Handler) http.Handler {
+
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.Header["Api"] != nil {
+			idToken, err := r.Cookie("Id")
+
+			v := idToken.Value
+
+			if err != nil {
+				http.Error(w, err.Error(), http.StatusInternalServerError)
+				return
+			}
 			if r.Header["Api"][0] == app.APIKey {
-				token, err := utils.CreateToken()
+				token, err := utils.CreateToken(v)
 
 				if err != nil {
 					http.Error(w, err.Error(), http.StatusUnauthorized)
@@ -19,6 +34,9 @@ func CheckForAPIKey(next http.Handler) http.Handler {
 				}
 
 				w.Header().Set("token", token)
+			} else {
+				http.Redirect(w, r, "/", http.StatusSeeOther)
+				return
 			}
 		}
 

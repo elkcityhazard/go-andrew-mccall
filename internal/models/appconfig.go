@@ -13,4 +13,6 @@ type AppConfig struct {
 	DB            *sql.DB
 	TemplateCache map[string]*template.Template
 	IsProduction  bool
+	Username      string
+	Password      string
 }
