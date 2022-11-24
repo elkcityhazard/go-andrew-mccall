@@ -8,6 +8,7 @@ import (
 
 func SetAPIKey(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+
 		r.Header.Set("Api", app.APIKey)
 		next.ServeHTTP(w, r)
 	})
@@ -16,6 +17,7 @@ func SetAPIKey(next http.Handler) http.Handler {
 func CheckForAPIKey(next http.Handler) http.Handler {
 
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+
 		if r.Header["Api"] != nil {
 			idToken, err := r.Cookie("Id")
 

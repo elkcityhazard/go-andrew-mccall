@@ -1,0 +1,57 @@
+@use './_mixins' as *;
+
+form {
+  max-width: 768px;
+  margin: auto;
+}
+
+form.login-form {
+  max-width: 275px;
+}
+
+.form-control {
+  @include base-transition;
+  display: flex;
+  min-height: 30px;
+  margin-bottom: 0.5em;
+}
+
+label,
+input,
+textarea{
+  @include base-transition;
+  font-size: 18px;
+  padding: 5px 7px;
+  width: 100%;
+}
+
+label {
+  position: relative;
+}
+
+input {
+  background: transparent;
+  border: none;
+  outline: 1px solid #000;
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translate(0, -50%);
+}
+
+form.login-form * input[type="submit"] {
+  background: indigo;
+  color: #fff;
+  cursor: pointer;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+label {
+  &:focus-within {
+    color: transparent;
+  }
+}
+
+
+

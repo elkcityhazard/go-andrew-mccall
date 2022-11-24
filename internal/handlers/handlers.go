@@ -50,7 +50,16 @@ func (m *Repository) Login(w http.ResponseWriter, r *http.Request) {
 
 	switch r.Method {
 	case "GET":
-		render.RenderTemplate(w, r, "signup.tmpl.html", &models.TemplateData{})
+
+		var stringMap = map[string]string{}
+
+		stringMap["title"] = "Login"
+
+		fmt.Println("String Map:", stringMap)
+
+		render.RenderTemplate(w, r, "login.tmpl.html", &models.TemplateData{
+			StringMap: stringMap,
+		})
 	case "POST":
 		err := r.ParseForm()
 
@@ -61,6 +70,11 @@ func (m *Repository) Login(w http.ResponseWriter, r *http.Request) {
 
 		email := r.Form.Get("email")
 		password := r.Form.Get("password")
+
+		if email == "" || password == "" {
+			http.Redirect(w, r, "/admin/login", http.StatusSeeOther)
+			return
+		}
 
 		u := models.User{}
 
@@ -74,9 +88,18 @@ func (m *Repository) Login(w http.ResponseWriter, r *http.Request) {
 		err = bcrypt.CompareHashAndPassword(user.Password, []byte(password))
 
 		if err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
+			http.Error(w, err.Error(), http.StatusUnauthorized)
 			return
 		}
+
+		IdCookie := http.Cookie{
+			Name:     "Id",
+			Value:    strconv.Itoa(user.Id),
+			HttpOnly: true,
+			MaxAge:   3600,
+		}
+
+		http.SetCookie(w, &IdCookie)
 
 		m.GetJWT(w, r)
 
@@ -234,11 +257,12 @@ func (m *Repository) GetJWT(w http.ResponseWriter, r *http.Request) {
 
 	idToken, err := r.Cookie("Id")
 
-	v := idToken.Value
-
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
 	}
+
+	v := idToken.Value
 
 	token, err := utils.CreateToken(v)
 

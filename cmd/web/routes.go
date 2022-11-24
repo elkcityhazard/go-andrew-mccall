@@ -20,5 +20,5 @@ func routes() http.Handler {
 	mux.Handle("/admin/add-post", utils.ValidateJWT(handlers.Repo.AddPost))
 	mux.HandleFunc("/admin/get-jwt", handlers.Repo.GetJWT)
 
-	return mux
+	return CheckForAPIKey(SetAPIKey(mux))
 }

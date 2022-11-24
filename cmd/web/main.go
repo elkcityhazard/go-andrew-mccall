@@ -26,22 +26,17 @@ func main() {
 
 	flag.Parse()
 
-	fmt.Println("password", app.Password)
-
-	fmt.Println(app)
-
 	db, err := sql.Open("mysql", fmt.Sprintf("%s:%s@tcp(192.168.0.4:3306)/andrew_mccall", app.Username, app.Password))
 
 	if err != nil {
 		log.Fatalln(err)
 	}
 
-	// err = db.Ping()
+	err = db.Ping()
 
-	// if err != nil {
-	// 	fmt.Println(err)
-	// 	log.Fatalln(err)
-	// }
+	if err != nil {
+		log.Fatalln(err)
+	}
 
 	defer db.Close()
 
