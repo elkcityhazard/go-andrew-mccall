@@ -1,0 +1,5 @@
+@mixin base-transition() {
+  -moz-transition: all 300ms ease;
+  -webkit-transition: all 300ms ease;
+  transition: all 300ms ease;
+}

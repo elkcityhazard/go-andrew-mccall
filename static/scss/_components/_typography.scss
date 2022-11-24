@@ -1,0 +1,40 @@
+.text-center {
+  text-align: center;
+}
+
+.text-left {
+  text-align: left;
+}
+
+.text-right {
+  text-align: right;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: "DejaVu Sans", Verdana, Monospace;
+  margin-bottom: 1rem;
+  text-transform: uppercase;
+}
+
+a {
+  font-family: Verdana;
+  text-decoration: none;
+}
+
+.main-nav {
+  a {
+    color: #333;
+    font-weight: 600;
+    text-transform: uppercase;
+  }
+}
+
+
+p {
+  margin-bottom: 1rem;
+}
