@@ -37,11 +37,11 @@ func SetRepo(m *Repository) {
 
 func (m *Repository) Home(w http.ResponseWriter, r *http.Request) {
 
-	pathKey := r.URL.Path[len("/"):]
-
-	fmt.Println(pathKey)
-
-	fmt.Println("is this working?")
+	//pathKey := r.URL.Path[len("/"):]
+	//
+	//fmt.Println(pathKey)
+	//
+	//fmt.Println("is this working?")
 
 	render.RenderTemplate(w, r, "home.tmpl.html", &models.TemplateData{})
 }
@@ -283,6 +283,36 @@ func (m *Repository) GetJWT(w http.ResponseWriter, r *http.Request) {
 	w.Header().Add("Token", tokenCookie.Value)
 
 	_, err = fmt.Fprint(w, token)
+
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+}
+
+func (m *Repository) GetListOfPosts(w http.ResponseWriter, r *http.Request) {
+
+	pathKey := r.URL.Path[len("/posts/"):]
+
+	fmt.Println(pathKey)
+
+	post := models.Post{}
+
+	posts, err := post.GetMultiplePosts(m.AppConfig.DB)
+
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	data := make(map[string]interface{})
+
+	data["posts"] = posts
+
+	err = render.RenderTemplate(w, r, "list-posts.tmpl.html", &models.TemplateData{
+		Data: data,
+	})
 
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)

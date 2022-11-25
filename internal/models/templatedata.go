@@ -10,7 +10,7 @@ type DefaultTemplateData struct {
 type TemplateData struct {
 	StringMap           map[string]string
 	IntMap              map[string]string
-	Data                interface{}
+	Data                map[string]interface{}
 	DefaultTemplateData DefaultTemplateData
 }
 

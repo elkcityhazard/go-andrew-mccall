@@ -1,0 +1,34 @@
+{{ template "base" . }}
+
+{{ define "title" }}
+
+My home Page
+
+{{ end }}
+
+{{ define "Content"  }}
+
+{{ range .Data.posts }}
+
+<div class="card">
+    <div class="card-header">
+        <h3>{{ .Title }}</h3>
+        <time>{{ .PublishDate }}</time>
+        <time>{{ .UpdatedDate }}</time>
+    </div>
+    <div class="card-body">
+        {{ .Content }}
+    </div>
+    <div class="card-footer">
+        <a href="/posts/{{ .Id }}">{{ .Title }}</a>
+    </div>
+</div>
+{{ end }}
+
+{{ .DefaultTemplateData.SocialMedia}}
+
+{{ end }}
+
+{{ define "aside" }}
+This is the aside page
+{{ end }}

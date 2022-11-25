@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/elkcityhazard/go-andrew-mccall/internal/utils"
@@ -42,6 +43,20 @@ func CheckForAPIKey(next http.Handler) http.Handler {
 			}
 		}
 
+		next.ServeHTTP(w, r)
+	})
+}
+
+func IsLoggedIn(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		t, err := r.Cookie("Token")
+
+		if err != nil {
+			http.Redirect(w, r, "/admin/login", http.StatusSeeOther)
+			return
+		}
+
+		fmt.Println(t)
 		next.ServeHTTP(w, r)
 	})
 }

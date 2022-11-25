@@ -26,7 +26,7 @@ func main() {
 
 	flag.Parse()
 
-	db, err := sql.Open("mysql", fmt.Sprintf("%s:%s@tcp(192.168.0.4:3306)/andrew_mccall", app.Username, app.Password))
+	db, err := sql.Open("mysql", fmt.Sprintf("%s:%s@tcp(192.168.0.4:3306)/andrew_mccall?parseTime=true", app.Username, app.Password))
 
 	if err != nil {
 		log.Fatalln(err)
