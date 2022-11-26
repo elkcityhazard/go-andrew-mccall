@@ -26,17 +26,13 @@ textarea{
 }
 
 label {
-  position: relative;
+  // position: relative;
 }
 
 input {
   background: transparent;
   border: none;
   outline: 1px solid #000;
-  position: absolute;
-  left: 0;
-  top: 50%;
-  transform: translate(0, -50%);
 }
 
 form.login-form * input[type="submit"] {

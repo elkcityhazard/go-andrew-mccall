@@ -42,6 +42,9 @@ a.phone {
 .main-footer .container {
   margin: auto;
 }
+.main-footer .container .row {
+  gap: 1.5em;
+}
 
 .footer-logo {
   border-radius: 50%;
@@ -118,15 +121,33 @@ a.phone {
   left: 50%;
   transform: translateX(-50%);
 }
-.row {
+.wrapper {
+  display: grid;
+}
+
+.container {
+  display: block;
+  max-width: 1200px;
+  margin: auto;
+  width: 100%;
+}
+.container .row {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(275px, 1fr));
   margin-bottom: 1.5rem;
   padding: 0.25rem 0.33rem;
 }
+.container .row.right-rail {
+  grid-template-columns: 2fr 1fr;
+}
 
 .main-content {
   min-height: 75vh;
+  min-width: 75%;
+}
+
+aside {
+  width: 25%;
 }
 
 .text-center {
@@ -196,18 +217,10 @@ textarea {
   width: 100%;
 }
 
-label {
-  position: relative;
-}
-
 input {
   background: transparent;
   border: none;
   outline: 1px solid #000;
-  position: absolute;
-  left: 0;
-  top: 50%;
-  transform: translate(0, -50%);
 }
 
 form.login-form * input[type=submit] {

@@ -8,27 +8,23 @@ My home Page
 
 {{ define "Content"  }}
 
-{{ range .Data.posts }}
+{{ with .Data.post  }}
 
 <div class="card">
     <div class="card-header">
         <h3>{{ .Title }}</h3>
-        <div>
-            <span><strong>Published: </strong></span><time>{{ .PublishDate | humanDate }}</time>
-        </div>
-        <div>
-            <span><strong>Updated: </strong></span><time>{{ .UpdatedDate | humanDate }}</time>
-
-        </div>
+        <time>{{ .PublishDate | humanDate }}</time>
+        <time>{{ .UpdatedDate | humanDate }}</time>
     </div>
     <div class="card-body">
-        {{ .Content }}
+        {{ .Content  }}
     </div>
     <div class="card-footer">
         <a href="/posts/{{ .Id }}">{{ .Title }}</a>
     </div>
 </div>
 {{ end }}
+
 
 {{ end }}
 

@@ -37,12 +37,6 @@ func SetRepo(m *Repository) {
 
 func (m *Repository) Home(w http.ResponseWriter, r *http.Request) {
 
-	//pathKey := r.URL.Path[len("/"):]
-	//
-	//fmt.Println(pathKey)
-	//
-	//fmt.Println("is this working?")
-
 	render.RenderTemplate(w, r, "home.tmpl.html", &models.TemplateData{})
 }
 
@@ -54,8 +48,6 @@ func (m *Repository) Login(w http.ResponseWriter, r *http.Request) {
 		var stringMap = map[string]string{}
 
 		stringMap["title"] = "Login"
-
-		fmt.Println("String Map:", stringMap)
 
 		render.RenderTemplate(w, r, "login.tmpl.html", &models.TemplateData{
 			StringMap: stringMap,
@@ -125,27 +117,45 @@ func (m *Repository) AddPost(w http.ResponseWriter, r *http.Request) {
 		p.Title = r.Form.Get("title")
 		p.Description = r.Form.Get("description")
 		p.Summary = r.Form.Get("summary")
-		pd, err := time.Parse("2006-01-01T00:00:00.000Z", r.Form.Get("publishDate"))
+
+		fmt.Println(r.Form.Get("publishDate"))
+
+		pd, err := time.Parse("2006-01-02", r.Form.Get("publishDate"))
 		if err != nil {
 			http.Error(w, fmt.Sprintf("%s", err), http.StatusInternalServerError)
 			return
 		}
 		p.PublishDate = pd
-		ed, err := time.Parse("2006-01-01T00:00:00.000Z", r.Form.Get("expireDate"))
+		ed, err := time.Parse("2006-01-02", r.Form.Get("expireDate"))
 		if err != nil {
 			http.Error(w, fmt.Sprintf("%s", err), http.StatusInternalServerError)
 			return
 		}
 		p.ExpireDate = ed
 
-		ud, err := time.Parse("2006-01-01T00:00:00.000Z", r.Form.Get("expireDate"))
+		ud, err := time.Parse("2006-01-02", r.Form.Get("expireDate"))
 		if err != nil {
 			http.Error(w, fmt.Sprintf("%s", err), http.StatusInternalServerError)
 			return
 		}
 		p.UpdatedDate = ud
 
-		p.InsertIntoDB(m.AppConfig.DB)
+		token, err := r.Cookie("Id")
+
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+
+		res, err := p.InsertIntoDB(m.AppConfig.DB, token.Value)
+
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+
+		fmt.Println(res)
+
 	}
 
 }
@@ -293,30 +303,55 @@ func (m *Repository) GetJWT(w http.ResponseWriter, r *http.Request) {
 
 func (m *Repository) GetListOfPosts(w http.ResponseWriter, r *http.Request) {
 
-	pathKey := r.URL.Path[len("/posts/"):]
+	postKey := r.URL.Path[len("/posts/"):]
 
-	fmt.Println(pathKey)
+	switch postKey {
+	case "":
+		post := models.Post{}
 
-	post := models.Post{}
+		posts, err := post.GetMultiplePosts(m.AppConfig.DB)
 
-	posts, err := post.GetMultiplePosts(m.AppConfig.DB)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
 
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
+		data := make(map[string]interface{})
 
-	data := make(map[string]interface{})
+		data["posts"] = posts
 
-	data["posts"] = posts
+		err = render.RenderTemplate(w, r, "list-posts.tmpl.html", &models.TemplateData{
+			Data: data,
+		})
 
-	err = render.RenderTemplate(w, r, "list-posts.tmpl.html", &models.TemplateData{
-		Data: data,
-	})
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+	case postKey:
+		p := &models.Post{}
 
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
+		idKey, err := strconv.Atoi(postKey)
+
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+
+		post, err := p.GetSinglePost(m.AppConfig.DB, idKey)
+
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+
+		data := make(map[string]interface{})
+
+		data["post"] = post
+
+		render.RenderTemplate(w, r, "single-post.tmpl.html", &models.TemplateData{
+			Data: data,
+		})
 	}
 
 }

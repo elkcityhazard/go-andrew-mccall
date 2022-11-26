@@ -7,11 +7,31 @@ import (
 	"html/template"
 	"net/http"
 	"path/filepath"
+	"time"
 
 	"github.com/elkcityhazard/go-andrew-mccall/internal/models"
+	"github.com/yuin/goldmark"
 )
 
-var myFuncMap template.FuncMap
+// Create a humanDate function which returns a nicely formatted string
+// representation of a time.Time object.
+func humanDate(t time.Time) string {
+	return t.Format("02 Jan 2006 at 15:04")
+}
+
+func parseMarkdown(source string) string {
+	var buf bytes.Buffer
+	if err := goldmark.Convert([]byte(source), &buf); err != nil {
+		panic(err)
+	}
+
+	return buf.String()
+}
+
+var myFuncMap = template.FuncMap{
+	"humanDate":     humanDate,
+	"parseMarkdown": parseMarkdown,
+}
 
 var app *models.AppConfig
 
@@ -46,8 +66,6 @@ func AddDefaultTemplateData() models.DefaultTemplateData {
 func RenderTemplate(w http.ResponseWriter, r *http.Request, tmpl string, td *models.TemplateData) error {
 
 	var tc map[string]*template.Template
-
-	fmt.Println(app)
 
 	if app.IsProduction {
 		tc = app.TemplateCache

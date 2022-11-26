@@ -11,13 +11,19 @@
 </head>
 <body>
 <div class="wrapper">
-    {{ template "navigation" . }}
-    <main class="main-content">
-        {{ template "Content" . }}
-    </main>
-    <aside class="main-aside">
-        {{ template "aside" . }}
-    </aside>
+    <div class="container">
+        <div class="row">
+            {{ template "navigation" . }}
+        </div>
+        <div class="row right-rail">
+            <main class="main-content">
+                {{ template "Content" . }}
+            </main>
+            <aside class="main-aside">
+                {{ template "aside" . }}
+            </aside>
+        </div>
+    </div>
 </div>
 {{ template "footer" . }}
 </body>

@@ -4,7 +4,6 @@ import (
 	"net/http"
 
 	"github.com/elkcityhazard/go-andrew-mccall/internal/handlers"
-	"github.com/elkcityhazard/go-andrew-mccall/internal/utils"
 )
 
 func routes() http.Handler {
@@ -13,12 +12,12 @@ func routes() http.Handler {
 	fs := http.FileServer(http.Dir("./static"))
 	mux.Handle("/static/", http.StripPrefix("/static/", fs))
 
-	mux.HandleFunc("/posts", handlers.Repo.GetListOfPosts)
 	mux.HandleFunc("/", handlers.Repo.Home)
+	mux.HandleFunc("/posts/", handlers.Repo.GetListOfPosts)
 
 	mux.HandleFunc("/admin/signup", handlers.Repo.Signup)
 	mux.HandleFunc("/admin/login", handlers.Repo.Login)
-	mux.Handle("/admin/add-post", utils.ValidateJWT(handlers.Repo.AddPost))
+	mux.HandleFunc("/admin/add-post", handlers.Repo.AddPost)
 	mux.Handle("/admin/get-jwt", IsLoggedIn(http.HandlerFunc(handlers.Repo.GetJWT)))
 
 	return CheckForAPIKey(SetAPIKey(mux))

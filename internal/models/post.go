@@ -3,7 +3,7 @@ package models
 import (
 	"database/sql"
 	"errors"
-	"fmt"
+	"strconv"
 	"time"
 )
 
@@ -23,26 +23,40 @@ type Post struct {
 	UserID        int
 }
 
-func (p *Post) InsertIntoDB(db *sql.DB) {
+func (p *Post) InsertIntoDB(db *sql.DB, id string) (sql.Result, error) {
 
-	stmt := `INSERT INTO posts (title, 
-                   description, 
-                   summary, 
-                   publish_date, 
-                   update_date, 
-                   expire_date, 
+	newId, err := strconv.Atoi(id)
+
+	if err != nil {
+		return nil, err
+	}
+
+	p.UserID = newId
+
+	stmt := `INSERT INTO posts (
+				   title, 
+                   created_at, 
+                   updated_at, 
+                   expires_at, 
                    featured_image, 
                    content, 
-                   user_id)
-				   VALUES(?,?,?,?,?,?,?,?,?);
+                   author_id
+				)
+				   VALUES(?,?,?,?,?,?,?);
 			`
 
-	fmt.Println(stmt, p.Title, p.Description, p.Summary, p.PublishDate, p.UpdatedDate, p.ExpireDate, p.FeaturedImage, p.Content, p.UserID)
+	res, err := db.Exec(stmt, p.Title, p.PublishDate, time.Now(), p.ExpireDate, "", p.Content, p.UserID)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return res, nil
 
 }
 
 func (p *Post) GetSinglePost(db *sql.DB, id int) (*Post, error) {
-	stmt := `SELECT id, title, content, created_at, updated_at, expires_at, featured_image FROM posts WHERE expires < UTC_TIMESTAMP() and id = ?`
+	stmt := `SELECT id, title, content, created_at, updated_at, expires_at, featured_image FROM posts WHERE expires_at > UTC_TIMESTAMP() and id = ?`
 
 	row := db.QueryRow(stmt, id)
 
