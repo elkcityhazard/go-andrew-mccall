@@ -127,7 +127,7 @@ a.phone {
 
 .container {
   display: block;
-  max-width: 1200px;
+  max-width: 1366px;
   margin: auto;
   width: 100%;
 }
@@ -148,6 +148,11 @@ a.phone {
 
 aside {
   width: 25%;
+}
+
+.card {
+  border-bottom: 1px dashed #666;
+  margin-bottom: 1.5em;
 }
 
 .text-center {
@@ -186,6 +191,14 @@ a {
 
 p {
   margin-bottom: 1rem;
+}
+
+.byline {
+  display: inline-block;
+  font-family: "Courier";
+  font-size: 1em;
+  padding: 0.5rem 0rem;
+  text-transform: uppercase;
 }
 
 form {

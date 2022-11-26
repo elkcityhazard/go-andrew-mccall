@@ -50,7 +50,7 @@ func AddDefaultTemplateData() models.DefaultTemplateData {
 			},
 			{
 				Name:   "Blog",
-				URL:    "/blog",
+				URL:    "/posts",
 				Weight: 3,
 			},
 		},

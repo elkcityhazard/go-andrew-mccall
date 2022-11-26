@@ -8,24 +8,25 @@ My home Page
 
 {{ define "Content"  }}
 
-{{ range .Data.posts }}
+{{ $authors := .Data.authors }}
+
+{{ range $i,$v := .Data.posts }}
 
 <div class="card">
     <div class="card-header">
-        <h3>{{ .Title }}</h3>
+        <h3>{{ $v.Title }}</h3>
         <div>
-            <span><strong>Published: </strong></span><time>{{ .PublishDate | humanDate }}</time>
-        </div>
-        <div>
-            <span><strong>Updated: </strong></span><time>{{ .UpdatedDate | humanDate }}</time>
-
+            <span><strong>Published: </strong></span><time>{{ $v.PublishDate | humanDate }}</time> | <span><strong>Updated: </strong></span><time>{{ $v.UpdatedDate | humanDate }}</time>
+            <div class="byline-wrapper">
+                <strong>By: </strong><span class="byline">{{ with index $authors $i }} {{ .Email }} {{ end }}</span>
+            </div>
         </div>
     </div>
     <div class="card-body">
-        {{ .Content }}
+        {{ $v.Content }}
     </div>
     <div class="card-footer">
-        <a href="/posts/{{ .Id }}">{{ .Title }}</a>
+        <a href="/posts/{{ .Id }}">{{ $v.Title }}</a>
     </div>
 </div>
 {{ end }}

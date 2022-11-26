@@ -8,6 +8,8 @@ My home Page
 
 {{ define "Content"  }}
 
+{{ $author := .Data.author }}
+
 {{ with .Data.post  }}
 
 <div class="card">
@@ -15,6 +17,9 @@ My home Page
         <h3>{{ .Title }}</h3>
         <time>{{ .PublishDate | humanDate }}</time>
         <time>{{ .UpdatedDate | humanDate }}</time>
+        <div class="byline-wrapper">
+            <strong>BY: </strong><span class="byline">{{ $author.Email}}</span>
+        </div>
     </div>
     <div class="card-body">
         {{ .Content  }}

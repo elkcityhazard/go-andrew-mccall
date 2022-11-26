@@ -17,8 +17,8 @@ func routes() http.Handler {
 
 	mux.HandleFunc("/admin/signup", handlers.Repo.Signup)
 	mux.HandleFunc("/admin/login", handlers.Repo.Login)
-	mux.HandleFunc("/admin/add-post", handlers.Repo.AddPost)
-	mux.Handle("/admin/get-jwt", IsLoggedIn(http.HandlerFunc(handlers.Repo.GetJWT)))
+	mux.Handle("/admin/add-post", IsLoggedIn(http.HandlerFunc(handlers.Repo.AddPost)))
+	mux.HandleFunc("/admin/get-jwt", handlers.Repo.GetJWT)
 
 	return CheckForAPIKey(SetAPIKey(mux))
 }

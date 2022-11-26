@@ -93,7 +93,25 @@ func (m *Repository) Login(w http.ResponseWriter, r *http.Request) {
 
 		http.SetCookie(w, &IdCookie)
 
-		m.GetJWT(w, r)
+		token, err := utils.CreateToken(strconv.Itoa(user.Id))
+
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusUnauthorized)
+			return
+		}
+
+		idToken := http.Cookie{
+			Name:     "Token",
+			Value:    token,
+			MaxAge:   3600,
+			HttpOnly: true,
+			Path:     "/",
+		}
+
+		http.SetCookie(w, &idToken)
+
+		http.Redirect(w, r, "/posts/", http.StatusSeeOther)
+		return
 
 	}
 
@@ -316,9 +334,22 @@ func (m *Repository) GetListOfPosts(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
+		var authors []*models.Author
+
+		for _, v := range posts {
+			a, err := utils.GetAuthor(m.AppConfig.DB, v.AuthorId)
+
+			if err != nil {
+				http.Error(w, err.Error(), http.StatusInternalServerError)
+				return
+			}
+			authors = append(authors, a)
+		}
+
 		data := make(map[string]interface{})
 
 		data["posts"] = posts
+		data["authors"] = authors
 
 		err = render.RenderTemplate(w, r, "list-posts.tmpl.html", &models.TemplateData{
 			Data: data,
@@ -345,9 +376,20 @@ func (m *Repository) GetListOfPosts(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
+		fmt.Println("User ID: ", post.UserID)
+
+		author, err := utils.GetAuthor(m.AppConfig.DB, post.UserID)
+
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+
 		data := make(map[string]interface{})
 
 		data["post"] = post
+
+		data["author"] = author
 
 		render.RenderTemplate(w, r, "single-post.tmpl.html", &models.TemplateData{
 			Data: data,
