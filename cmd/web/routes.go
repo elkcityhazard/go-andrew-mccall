@@ -1,7 +1,8 @@
 package main
 
 import (
-	"fmt"
+	"github.com/elkcityhazard/go-andrew-mccall/internal/models"
+	"github.com/elkcityhazard/go-andrew-mccall/internal/render"
 	"github.com/julienschmidt/httprouter"
 	"net/http"
 
@@ -13,13 +14,15 @@ func routes() http.Handler {
 
 	router := httprouter.New()
 
-	router.NotFound = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		fmt.Fprint(w, "Sorry, the page you are looking for cannot be found")
-	})
-
 	dynamic := alice.New(app.SessionManager.LoadAndSave, noSurf)
 
 	protected := dynamic.Append(RequireAuthentication)
+
+	router.NotFound = dynamic.ThenFunc(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		app.SessionManager.Put(r.Context(), "flash", "I am sorry, but that page can not be found")
+
+		render.RenderTemplate(w, r, "404.tmpl.html", &models.TemplateData{})
+	}))
 
 	fs := http.FileServer(http.Dir("./static"))
 

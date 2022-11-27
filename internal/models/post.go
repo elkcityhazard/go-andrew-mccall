@@ -34,7 +34,9 @@ func (p *Post) InsertIntoDB(db *sql.DB, id string) (sql.Result, error) {
 	p.UserID = newId
 
 	stmt := `INSERT INTO posts (
-				   title, 
+				   title,
+                   description,
+                   summary,
                    created_at, 
                    updated_at, 
                    expires_at, 
@@ -42,10 +44,10 @@ func (p *Post) InsertIntoDB(db *sql.DB, id string) (sql.Result, error) {
                    content, 
                    author_id
 				)
-				   VALUES(?,?,?,?,?,?,?);
+				   VALUES(?,?,?,?,?,?,?,?,?);
 			`
 
-	res, err := db.Exec(stmt, p.Title, p.PublishDate, time.Now(), p.ExpireDate, "", p.Content, p.UserID)
+	res, err := db.Exec(stmt, p.Title, p.Description, p.Summary, p.PublishDate, time.Now(), p.ExpireDate, "", p.Content, p.UserID)
 
 	if err != nil {
 		return nil, err
@@ -56,13 +58,13 @@ func (p *Post) InsertIntoDB(db *sql.DB, id string) (sql.Result, error) {
 }
 
 func (p *Post) GetSinglePost(db *sql.DB, id int) (*Post, error) {
-	stmt := `SELECT id, title, content, author_id, created_at, updated_at, expires_at, featured_image FROM posts WHERE expires_at > UTC_TIMESTAMP() and id = ?`
+	stmt := `SELECT id, title, content, summary, description, author_id, created_at, updated_at, expires_at, featured_image FROM posts WHERE expires_at > UTC_TIMESTAMP() and id = ?`
 
 	row := db.QueryRow(stmt, id)
 
 	cp := &Post{}
 
-	err := row.Scan(&cp.Id, &cp.Title, &cp.Content, &cp.UserID, &cp.PublishDate, &cp.UpdatedDate, &cp.ExpireDate, &cp.FeaturedImage)
+	err := row.Scan(&cp.Id, &cp.Title, &cp.Content, &cp.Summary, &cp.Description, &cp.UserID, &cp.PublishDate, &cp.UpdatedDate, &cp.ExpireDate, &cp.FeaturedImage)
 
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
@@ -76,7 +78,7 @@ func (p *Post) GetSinglePost(db *sql.DB, id int) (*Post, error) {
 }
 
 func (p *Post) GetMultiplePosts(db *sql.DB) ([]*Post, error) {
-	stmt := `SELECT id, title, content, summary, author_id, created_at, updated_at, expires_at, featured_image FROM posts WHERE expires_at > UTC_TIMESTAMP() ORDER BY created_at desc limit 3`
+	stmt := `SELECT id, title, content, summary, author_id, created_at, updated_at, expires_at, featured_image FROM posts WHERE expires_at > UTC_TIMESTAMP() ORDER BY created_at DESC limit 3`
 
 	rows, err := db.Query(stmt)
 

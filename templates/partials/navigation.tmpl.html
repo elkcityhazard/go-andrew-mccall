@@ -6,16 +6,18 @@
 <nav class="main-nav">
     {{ range . }}
 {{ if and $IsAuthenticated (eq .HasAuthentication true)}}
-<a href="{{ .URL }}" title="{{ .Name }}">{{ .Name }}</a>
-    {{ end }}
-    {{ else }}
 
-    {{ with and (eq $IsAuthenticated false) (eq .HasAuthentication false) }}
+<a href="{{ .URL }}" title="{{ .Name }}">{{ .Name }}</a>
+
+    {{ else }}
+    {{ if and (eq $IsAuthenticated false) ( eq .HasAuthentication false ) }}
     <a href="{{ .URL }}" title="{{ .Name }}">{{ .Name }}</a>
+
     {{ end }}
-</nav>
+    {{ end }}
 
 {{ end }}
+</nav>
 
 {{ end }}
 

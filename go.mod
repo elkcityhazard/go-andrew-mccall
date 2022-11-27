@@ -9,8 +9,7 @@ require (
 	github.com/golang-jwt/jwt/v4 v4.4.2
 	github.com/julienschmidt/httprouter v1.3.0
 	github.com/justinas/alice v1.2.0
+	github.com/justinas/nosurf v1.1.1
 	github.com/yuin/goldmark v1.5.3
 	golang.org/x/crypto v0.3.0
 )
-
-require github.com/justinas/nosurf v1.1.1 // indirect

@@ -6,6 +6,7 @@ import (
 	"github.com/julienschmidt/httprouter"
 	"html"
 	"net/http"
+	"net/mail"
 	"strconv"
 	"time"
 
@@ -66,6 +67,13 @@ func (m *Repository) Login(w http.ResponseWriter, r *http.Request) {
 		password := r.Form.Get("password")
 
 		if email == "" || password == "" {
+			http.Redirect(w, r, "/admin/login", http.StatusSeeOther)
+			return
+		}
+
+		_, err = mail.ParseAddress(email)
+
+		if err != nil {
 			http.Redirect(w, r, "/admin/login", http.StatusSeeOther)
 			return
 		}
@@ -436,6 +444,8 @@ func (m Repository) GetSinglePost(w http.ResponseWriter, r *http.Request) {
 	data["post"] = post
 
 	data["author"] = author
+
+	data["description"] = post.Description
 
 	render.RenderTemplate(w, r, "single-post.tmpl.html", &models.TemplateData{
 		Data: data,
