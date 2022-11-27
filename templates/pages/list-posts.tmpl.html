@@ -6,7 +6,7 @@ My home Page
 
 {{ end }}
 
-{{ define "Content"  }}
+{{ define "Content" }}
 
 {{ $authors := .Data.authors }}
 
@@ -23,7 +23,7 @@ My home Page
         </div>
     </div>
     <div class="card-body">
-        {{ $v.Content }}
+        <p class="summary">{{ $v.Summary }}</p>
     </div>
     <div class="card-footer">
         <a href="/posts/{{ .Id }}">{{ $v.Title }}</a>

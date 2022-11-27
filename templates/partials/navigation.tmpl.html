@@ -1,12 +1,24 @@
 {{ define "navigation" }}
 
+{{ $IsAuthenticated := .DefaultTemplateData.IsAuthenticated }}
+
 {{ with .DefaultTemplateData.Navigation }}
 <nav class="main-nav">
     {{ range . }}
+{{ if and $IsAuthenticated (eq .HasAuthentication true)}}
 <a href="{{ .URL }}" title="{{ .Name }}">{{ .Name }}</a>
+    {{ end }}
+    {{ else }}
+
+    {{ with and (eq $IsAuthenticated false) (eq .HasAuthentication false) }}
+    <a href="{{ .URL }}" title="{{ .Name }}">{{ .Name }}</a>
     {{ end }}
 </nav>
 
 {{ end }}
 
 {{ end }}
+
+{{ end }}
+
+

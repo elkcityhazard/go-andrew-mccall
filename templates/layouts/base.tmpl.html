@@ -17,6 +17,15 @@
         </div>
         <div class="row right-rail">
             <main class="main-content">
+                {{ block "Flash" . }}
+                {{ with .DefaultTemplateData.FlashMessage }}
+                    <div class="row" style="background: red; color: #fff; text-transform: uppercase;">
+                        <div class="col text-center">
+                            <p id="flashMessage"> {{. }}</p>
+                        </div>
+                    </div>
+                {{ end }}
+                {{ end }}
                 {{ template "Content" . }}
             </main>
             <aside class="main-aside">

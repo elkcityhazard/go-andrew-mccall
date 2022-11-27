@@ -12,6 +12,9 @@ Login
 </header>
 <form action="/admin/login" method="post" class="login-form">
     <div class="form-control">
+        <input type="hidden" name="csrf_token" value="{{.DefaultTemplateData.CSRFToken}}">
+    </div>
+    <div class="form-control">
         <label for="email">Email: <input type="text" name="email" id="user_email"></label>
     </div>
     <div class="form-control">

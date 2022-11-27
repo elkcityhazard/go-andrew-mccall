@@ -4,6 +4,8 @@ import (
 	"database/sql"
 	"flag"
 	"fmt"
+	"github.com/alexedwards/scs/mysqlstore"
+	"github.com/alexedwards/scs/v2"
 	"log"
 	"net/http"
 	"time"
@@ -51,6 +53,16 @@ func main() {
 	}
 
 	app.TemplateCache = tc
+
+	// create a new Session Manager
+
+	sessionManager := scs.New()
+
+	sessionManager.Store = mysqlstore.New(app.DB)
+
+	sessionManager.Lifetime = 1 * time.Hour
+
+	app.SessionManager = sessionManager
 
 	//	New handlers
 

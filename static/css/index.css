@@ -201,6 +201,25 @@ p {
   text-transform: uppercase;
 }
 
+.summary {
+  --max-lines: 2;
+  color: #333;
+  display: -webkit-box;
+  font-style: italic;
+  -webkit-line-clamp: var(--max-lines);
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  padding: 0.5em 0;
+}
+
+#flashMessage {
+  background: red;
+  color: #fff;
+  text-transform: uppercase;
+  padding: 1rem;
+  text-align: center;
+}
+
 form {
   max-width: 768px;
   margin: auto;
@@ -246,6 +265,10 @@ form.login-form * input[type=submit] {
 
 label:focus-within {
   color: transparent;
+}
+
+.d-none {
+  display: none;
 }
 
 /*# sourceMappingURL=index.css.map */

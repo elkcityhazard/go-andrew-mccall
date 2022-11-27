@@ -1,7 +1,9 @@
 package handlers
 
 import (
+	"errors"
 	"fmt"
+	"github.com/julienschmidt/httprouter"
 	"html"
 	"net/http"
 	"strconv"
@@ -84,41 +86,29 @@ func (m *Repository) Login(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		IdCookie := http.Cookie{
-			Name:     "Id",
-			Value:    strconv.Itoa(user.Id),
-			HttpOnly: true,
-			MaxAge:   3600,
-		}
+		fmt.Println(user.Id)
 
-		http.SetCookie(w, &IdCookie)
-
-		token, err := utils.CreateToken(strconv.Itoa(user.Id))
-
-		if err != nil {
-			http.Error(w, err.Error(), http.StatusUnauthorized)
-			return
-		}
-
-		idToken := http.Cookie{
-			Name:     "Token",
-			Value:    token,
-			MaxAge:   3600,
-			HttpOnly: true,
-			Path:     "/",
-		}
-
-		http.SetCookie(w, &idToken)
+		app.SessionManager.Put(r.Context(), "authenticatedUserID", strconv.Itoa(user.Id))
 
 		http.Redirect(w, r, "/posts/", http.StatusSeeOther)
-		return
 
 	}
 
 }
 
+func (m *Repository) Logout(w http.ResponseWriter, r *http.Request) {
+	app.SessionManager.Remove(r.Context(), "authenticatedUserID")
+
+	app.SessionManager.Put(r.Context(), "flash", "You have been logged out successfully")
+
+	http.Redirect(w, r, "/admin/login", http.StatusSeeOther)
+	return
+}
+
 func (m *Repository) AddPost(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Allow", "POST, GET")
+
+	fmt.Println(app.SessionManager.Exists(r.Context(), "authenticatedUserID"))
 	switch r.Method {
 	case "GET":
 		render.RenderTemplate(w, r, "create-post.tmpl.html", &models.TemplateData{})
@@ -130,9 +120,22 @@ func (m *Repository) AddPost(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
+		loggedIn := app.SessionManager.Exists(r.Context(), "authenticatedUserID")
+
+		if !loggedIn {
+			err := errors.New("authentication error")
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+
+		userId := app.SessionManager.GetString(r.Context(), "authenticatedUserID")
+
+		fmt.Println("userID: ", userId)
+
 		p := models.Post{}
 
 		p.Title = r.Form.Get("title")
+		p.Content = r.Form.Get("content")
 		p.Description = r.Form.Get("description")
 		p.Summary = r.Form.Get("summary")
 
@@ -158,21 +161,21 @@ func (m *Repository) AddPost(w http.ResponseWriter, r *http.Request) {
 		}
 		p.UpdatedDate = ud
 
-		token, err := r.Cookie("Id")
-
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
 
-		res, err := p.InsertIntoDB(m.AppConfig.DB, token.Value)
+		_, err = p.InsertIntoDB(m.AppConfig.DB, userId)
 
 		if err != nil {
+			fmt.Println(err)
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
 
-		fmt.Println(res)
+		http.Redirect(w, r, "/posts", http.StatusSeeOther)
+		return
 
 	}
 
@@ -321,6 +324,8 @@ func (m *Repository) GetJWT(w http.ResponseWriter, r *http.Request) {
 
 func (m *Repository) GetListOfPosts(w http.ResponseWriter, r *http.Request) {
 
+	fmt.Println(app.SessionManager.GetString(r.Context(), "authenticatedUserID"))
+
 	postKey := r.URL.Path[len("/posts/"):]
 
 	switch postKey {
@@ -396,4 +401,43 @@ func (m *Repository) GetListOfPosts(w http.ResponseWriter, r *http.Request) {
 		})
 	}
 
+}
+
+func (m Repository) GetSinglePost(w http.ResponseWriter, r *http.Request) {
+	p := &models.Post{}
+
+	params := httprouter.ParamsFromContext(r.Context())
+
+	postID, err := strconv.Atoi(params.ByName("id"))
+
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	post, err := p.GetSinglePost(m.AppConfig.DB, postID)
+
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	fmt.Println("User ID: ", post.UserID)
+
+	author, err := utils.GetAuthor(m.AppConfig.DB, post.UserID)
+
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	data := make(map[string]interface{})
+
+	data["post"] = post
+
+	data["author"] = author
+
+	render.RenderTemplate(w, r, "single-post.tmpl.html", &models.TemplateData{
+		Data: data,
+	})
 }

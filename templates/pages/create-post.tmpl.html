@@ -10,6 +10,9 @@
 <div class="container">
     <div class="row">
         <form action="/admin/add-post" method="POST" class="add-post" enctype="multipart/form-data">
+            <div class="form-control d-none">
+                <input type="hidden" name="csrf_token" value="{{.DefaultTemplateData.CSRFToken}}">
+            </div>
             <div class="form-control">
                 <label for="title">Title: </label>
                 <input type="text" name="title" id="postTitle">

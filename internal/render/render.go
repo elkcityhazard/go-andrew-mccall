@@ -39,27 +39,49 @@ func NewRenderer(a *models.AppConfig) {
 	app = a
 }
 
-func AddDefaultTemplateData() models.DefaultTemplateData {
+func AddDefaultTemplateData(r *http.Request) models.DefaultTemplateData {
 
 	td := models.DefaultTemplateData{
 		Navigation: []models.Navigation{
 			{
-				Name:   "About",
-				URL:    "/about",
-				Weight: 2,
+				Name:              "About",
+				URL:               "/about",
+				Weight:            2,
+				HasAuthentication: false,
 			},
 			{
-				Name:   "Blog",
-				URL:    "/posts",
-				Weight: 3,
+				Name:              "Blog",
+				URL:               "/posts",
+				Weight:            3,
+				HasAuthentication: false,
+			},
+			{
+				Name:              "Login",
+				URL:               "/admin/login",
+				Weight:            4,
+				HasAuthentication: false,
+			},
+			{
+				Name:              "Logout",
+				URL:               "/admin/logout",
+				Weight:            5,
+				HasAuthentication: true,
+			},
+			{
+				Name:              "New Post",
+				URL:               "/admin/add-post",
+				Weight:            6,
+				HasAuthentication: true,
 			},
 		},
+		IsAuthenticated: app.IsAuthenticated(r),
 	}
 
 	td.SiteTitle = "Andrew McCall - Traverse City Web Design"
 	td.SocialMedia = td.AddSocial()
 	td.Nap = td.AddNap()
-
+	td.CSRFToken = td.AddNoSurf(r)
+	td.FlashMessage = td.AddFlashMessage(app, r)
 	return td
 }
 
@@ -86,7 +108,7 @@ func RenderTemplate(w http.ResponseWriter, r *http.Request, tmpl string, td *mod
 		return err
 	}
 
-	td.DefaultTemplateData = AddDefaultTemplateData()
+	td.DefaultTemplateData = AddDefaultTemplateData(r)
 
 	// need buf to write to first to ensure everything goes okay
 

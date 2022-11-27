@@ -1,10 +1,18 @@
 package models
 
+import (
+	"github.com/justinas/nosurf"
+	"net/http"
+)
+
 type DefaultTemplateData struct {
-	SiteTitle   string
-	Navigation  []Navigation
-	SocialMedia []SocialLink
-	Nap         NAP
+	SiteTitle       string
+	Navigation      []Navigation
+	SocialMedia     []SocialLink
+	Nap             NAP
+	IsAuthenticated bool
+	CSRFToken       string
+	FlashMessage    string
 }
 
 type TemplateData struct {
@@ -29,6 +37,10 @@ type NAP struct {
 	City      string
 	State     string
 	ZipCode   int
+}
+
+func (t *DefaultTemplateData) AddNoSurf(r *http.Request) string {
+	return nosurf.Token(r)
 }
 
 func (t *DefaultTemplateData) AddNap() NAP {
@@ -70,4 +82,9 @@ func (t *DefaultTemplateData) AddSocial() []SocialLink {
 			FilePath: "/static/images/social-media-icons/instagram.png",
 		},
 	}
+}
+
+func (t *DefaultTemplateData) AddFlashMessage(app *AppConfig, r *http.Request) string {
+	msg := app.SessionManager.PopString(r.Context(), "flash")
+	return msg
 }
