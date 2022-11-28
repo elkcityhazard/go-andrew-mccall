@@ -1,3 +1,17 @@
+@use './_mixins' as *;
+
 .d-none {
   display: none;
+}
+
+
+
+
+
+
+// Animations
+
+.fade-out {
+@include base-transition;
+opacity: 0;
 }

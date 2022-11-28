@@ -1,8 +1,16 @@
+{{ define "home-header" }}
+
 <header class="main-header">
     <div class="container">
         <div class="row">
-            <div class="col"></div>
+            <div class="col">
+                {{ with .Data }}
+                    <h1>{{ .SiteTitle }}</h1>
+                {{ end }}
+            </div>
             <div class="col"></div>
         </div>
     </div>
 </header>
+
+{{ end }}

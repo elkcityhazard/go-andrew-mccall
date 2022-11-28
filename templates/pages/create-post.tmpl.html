@@ -1,5 +1,7 @@
 {{ template "base" .}}
 
+
+
 {{ define "title" }}
 
 {{ end }}
@@ -52,6 +54,7 @@
             <div class="form-control">
                 <label for="content">Content: </label>
                 <textarea name="content" id="postContent" cols="30" rows="10">Enter Post Content</textarea>
+                {{ .Data.html }}
             </div>
             <div class="form-control">
                 <input type="submit" value="Submit">
@@ -59,7 +62,6 @@
         </form>
     </div>
 </div>
-
 {{ end }}
 
 {{ define "aside" }}

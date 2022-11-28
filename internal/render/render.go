@@ -10,7 +10,6 @@ import (
 	"time"
 
 	"github.com/elkcityhazard/go-andrew-mccall/internal/models"
-	"github.com/yuin/goldmark"
 )
 
 // Create a humanDate function which returns a nicely formatted string
@@ -19,18 +18,8 @@ func humanDate(t time.Time) string {
 	return t.Format("02 Jan 2006 at 15:04")
 }
 
-func parseMarkdown(source string) string {
-	var buf bytes.Buffer
-	if err := goldmark.Convert([]byte(source), &buf); err != nil {
-		panic(err)
-	}
-
-	return buf.String()
-}
-
 var myFuncMap = template.FuncMap{
-	"humanDate":     humanDate,
-	"parseMarkdown": parseMarkdown,
+	"humanDate": humanDate,
 }
 
 var app *models.AppConfig
@@ -44,6 +33,18 @@ func AddDefaultTemplateData(r *http.Request) models.DefaultTemplateData {
 	td := models.DefaultTemplateData{
 		Navigation: []models.Navigation{
 			{
+				Name:              "Andrew M McCall",
+				URL:               "/",
+				Weight:            1,
+				HasAuthentication: true,
+			},
+			{
+				Name:              "Andrew M McCall",
+				URL:               "/",
+				Weight:            1,
+				HasAuthentication: false,
+			},
+			{
 				Name:              "About",
 				URL:               "/about",
 				Weight:            2,
@@ -54,6 +55,12 @@ func AddDefaultTemplateData(r *http.Request) models.DefaultTemplateData {
 				URL:               "/posts",
 				Weight:            3,
 				HasAuthentication: false,
+			},
+			{
+				Name:              "Blog",
+				URL:               "/posts",
+				Weight:            3,
+				HasAuthentication: true,
 			},
 			{
 				Name:              "Login",
@@ -126,6 +133,7 @@ func RenderTemplate(w http.ResponseWriter, r *http.Request, tmpl string, td *mod
 	_, err = buf.WriteTo(w)
 
 	if err != nil {
+		fmt.Println(err)
 		return err
 	}
 

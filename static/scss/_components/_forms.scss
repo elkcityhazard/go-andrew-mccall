@@ -49,5 +49,19 @@ label {
   }
 }
 
+form.add-post {
+  width: 100%;
+  display: block;
+  margin: auto;
+  .form-control {
+    display: flex;
+    flex-flow: column nowrap;
+    color: #000;
+    textarea {
+      background: #999;
+    }
+  }
+}
+
 
 

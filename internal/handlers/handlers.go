@@ -3,12 +3,14 @@ package handlers
 import (
 	"errors"
 	"fmt"
-	"github.com/julienschmidt/httprouter"
 	"html"
+	"html/template"
 	"net/http"
 	"net/mail"
 	"strconv"
 	"time"
+
+	"github.com/julienschmidt/httprouter"
 
 	"github.com/elkcityhazard/go-andrew-mccall/internal/models"
 	"github.com/elkcityhazard/go-andrew-mccall/internal/render"
@@ -40,7 +42,13 @@ func SetRepo(m *Repository) {
 
 func (m *Repository) Home(w http.ResponseWriter, r *http.Request) {
 
-	render.RenderTemplate(w, r, "home.tmpl.html", &models.TemplateData{})
+	var data = make(map[string]interface{})
+
+	data["SiteTitle"] = "Andrew M McCall - Traverse City Web Design"
+
+	render.RenderTemplate(w, r, "home.tmpl.html", &models.TemplateData{
+		Data: data,
+	})
 }
 
 func (m *Repository) Login(w http.ResponseWriter, r *http.Request) {
@@ -97,6 +105,7 @@ func (m *Repository) Login(w http.ResponseWriter, r *http.Request) {
 		fmt.Println(user.Id)
 
 		app.SessionManager.Put(r.Context(), "authenticatedUserID", strconv.Itoa(user.Id))
+		app.SessionManager.Put(r.Context(), "flash", "Successfully Logged in!")
 
 		http.Redirect(w, r, "/posts/", http.StatusSeeOther)
 
@@ -119,7 +128,20 @@ func (m *Repository) AddPost(w http.ResponseWriter, r *http.Request) {
 	fmt.Println(app.SessionManager.Exists(r.Context(), "authenticatedUserID"))
 	switch r.Method {
 	case "GET":
-		render.RenderTemplate(w, r, "create-post.tmpl.html", &models.TemplateData{})
+
+		var data = make(map[string]interface{})
+
+		html := `<script>
+		console.log("does this work?")
+				var simplemde = new SimpleMDE({ element: document.getElementById("postContent") });
+				simplemde.value("Write Markdown Baby");
+				</script>`
+
+		data["html"] = template.HTML(fmt.Sprintf("%s", html))
+
+		render.RenderTemplate(w, r, "create-post.tmpl.html", &models.TemplateData{
+			Data: data,
+		})
 	case "POST":
 		err := r.ParseMultipartForm(2 << 20)
 
@@ -426,7 +448,8 @@ func (m Repository) GetSinglePost(w http.ResponseWriter, r *http.Request) {
 	post, err := p.GetSinglePost(m.AppConfig.DB, postID)
 
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		app.SessionManager.Put(r.Context(), "flash", "The page could not be found")
+		render.RenderTemplate(w, r, "404.tmpl.html", &models.TemplateData{})
 		return
 	}
 
@@ -441,11 +464,15 @@ func (m Repository) GetSinglePost(w http.ResponseWriter, r *http.Request) {
 
 	data := make(map[string]interface{})
 
-	data["post"] = post
-
 	data["author"] = author
 
 	data["description"] = post.Description
+
+	data["post"] = post
+
+	html := template.HTML(fmt.Sprintf("%s", post.Content))
+
+	data["html"] = html
 
 	render.RenderTemplate(w, r, "single-post.tmpl.html", &models.TemplateData{
 		Data: data,

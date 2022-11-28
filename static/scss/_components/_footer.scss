@@ -39,14 +39,23 @@ a.phone {
     text-align: left;
   }
   .main-nav {
+    align-items: flex-start;
+    justify-content: flex-start;
+    flex-flow: column wrap;
     width: auto;
     a {
       color: #fff;
       display: block;
       font-family: "DejaVu Sans", Verdana, Monospace;
-      margin: 0 auto 0.33rem;
+      margin: unset;
       text-decoration: underline;
       width: auto;
+      &:hover {
+        color: #fff;
+        &::after {
+          width: 0;
+        }
+      }
     }
   }
 }

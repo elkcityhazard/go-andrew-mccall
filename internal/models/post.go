@@ -1,10 +1,16 @@
 package models
 
 import (
+	"bytes"
 	"database/sql"
 	"errors"
 	"strconv"
 	"time"
+
+	"github.com/yuin/goldmark"
+	"github.com/yuin/goldmark/extension"
+	"github.com/yuin/goldmark/parser"
+	"github.com/yuin/goldmark/renderer/html"
 )
 
 type Post struct {
@@ -33,6 +39,21 @@ func (p *Post) InsertIntoDB(db *sql.DB, id string) (sql.Result, error) {
 
 	p.UserID = newId
 
+	md := goldmark.New(
+		goldmark.WithExtensions(extension.GFM),
+		goldmark.WithParserOptions(
+			parser.WithAutoHeadingID(),
+		),
+		goldmark.WithRendererOptions(
+			html.WithHardWraps(),
+			html.WithXHTML(),
+		),
+	)
+	var buf bytes.Buffer
+	if err := md.Convert([]byte(p.Content), &buf); err != nil {
+		panic(err)
+	}
+
 	stmt := `INSERT INTO posts (
 				   title,
                    description,
@@ -47,7 +68,7 @@ func (p *Post) InsertIntoDB(db *sql.DB, id string) (sql.Result, error) {
 				   VALUES(?,?,?,?,?,?,?,?,?);
 			`
 
-	res, err := db.Exec(stmt, p.Title, p.Description, p.Summary, p.PublishDate, time.Now(), p.ExpireDate, "", p.Content, p.UserID)
+	res, err := db.Exec(stmt, p.Title, p.Description, p.Summary, p.PublishDate, time.Now(), p.ExpireDate, "", buf.String(), p.UserID)
 
 	if err != nil {
 		return nil, err
@@ -78,7 +99,7 @@ func (p *Post) GetSinglePost(db *sql.DB, id int) (*Post, error) {
 }
 
 func (p *Post) GetMultiplePosts(db *sql.DB) ([]*Post, error) {
-	stmt := `SELECT id, title, content, summary, author_id, created_at, updated_at, expires_at, featured_image FROM posts WHERE expires_at > UTC_TIMESTAMP() ORDER BY created_at DESC limit 3`
+	stmt := `SELECT id, title, content, summary, author_id, created_at, updated_at, expires_at, featured_image FROM posts WHERE expires_at > UTC_TIMESTAMP() ORDER BY created_at DESC limit 10`
 
 	rows, err := db.Query(stmt)
 

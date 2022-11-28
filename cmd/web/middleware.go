@@ -1,8 +1,9 @@
 package main
 
 import (
-	"github.com/justinas/nosurf"
 	"net/http"
+
+	"github.com/justinas/nosurf"
 
 	"github.com/elkcityhazard/go-andrew-mccall/internal/utils"
 )
@@ -11,8 +12,9 @@ func secureHeaders(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		// Note: This is split across multiple lines for readability. You don't
 		// need to do this in your own code.
+		// w.Header().Set("Content-Type", "text/html")
 		w.Header().Set("Content-Security-Policy",
-			"default-src 'self'; style-src 'self' fonts.googleapis.com; font-src fonts.gstatic.com")
+			"default-src 'self' 'unsafe-inline'; style-src 'self' https://maxcdn.bootstrapcdn.com https://cdn.jsdelivr.net fonts.googleapis.com; font-src https://maxcdn.bootstrapcdn.com fonts.gstatic.com; script-src 'unsafe-inline' https://cdn.jsdelivr.net;")
 
 		w.Header().Set("Referrer-Policy", "origin-when-cross-origin")
 		w.Header().Set("X-Content-Type-Options", "nosniff")
