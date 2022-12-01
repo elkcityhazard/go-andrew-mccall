@@ -6,10 +6,15 @@ Login
 
 {{ define "Content" }}
 
-<form action="/admin/signup" method="post" class="login-form">
+<form action="/admin/signup" method="post" class="login-form" enctype="multipart/form-data">
+    <div class="form-control d-none"><label for="csrf_token"><input type="hidden" name="csrf_token" value="{{.DefaultTemplateData.CSRFToken}}">
+    </label></div>
     <div class="form-control">
         <label for="email">Input: <input type="text" name="email" id="user_email"></label>
     </div>
+   <div class="form-control">
+    <label for="avatar">Avatar: <input type="file" name="avatar" id="user_avatars"></label>
+   </div>
     <div class="form-control">
         <label for="password">Password: <input type="password" name="password" id="user_password"></label>
     </div>

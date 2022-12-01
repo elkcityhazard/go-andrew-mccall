@@ -7,6 +7,7 @@ import (
 	"html/template"
 	"net/http"
 	"net/mail"
+	"path"
 	"strconv"
 	"time"
 
@@ -25,6 +26,8 @@ type Repository struct {
 var app *models.AppConfig
 
 var Repo *Repository
+
+var uploadTools utils.Tools
 
 func NewHandlers(a *models.AppConfig) {
 	app = a
@@ -160,7 +163,29 @@ func (m *Repository) AddPost(w http.ResponseWriter, r *http.Request) {
 
 		userId := app.SessionManager.GetString(r.Context(), "authenticatedUserID")
 
-		fmt.Println("userID: ", userId)
+		intId, err := strconv.Atoi(userId)
+
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+
+		currentUser, err := utils.GetAuthor(app.DB, intId)
+
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		uploadTools.MaxFileSize = 2 << 20
+		uploadTools.AllowedFileTypes = []string{"image/jpeg", "image/jpg"}
+
+		pathToImage, err := uploadTools.UploadSingleFile(r, fmt.Sprintf("./uploads/%s", currentUser.Email), false)
+
+		if err != nil {
+			fmt.Println(err)
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
 
 		p := models.Post{}
 
@@ -168,6 +193,7 @@ func (m *Repository) AddPost(w http.ResponseWriter, r *http.Request) {
 		p.Content = r.Form.Get("content")
 		p.Description = r.Form.Get("description")
 		p.Summary = r.Form.Get("summary")
+		p.FeaturedImage = fmt.Sprintf("./uploads/%s%s", currentUser.Email, pathToImage.NewFileName)
 
 		fmt.Println(r.Form.Get("publishDate"))
 
@@ -224,15 +250,28 @@ func (m *Repository) Signup(w http.ResponseWriter, r *http.Request) {
 	case "POST":
 		err := r.ParseForm()
 
-		r.Header.Set("Api", app.APIKey)
-
 		if err != nil {
+			fmt.Println(err)
 			http.Error(w, fmt.Sprintf("%s", err), http.StatusInternalServerError)
 			return
 		}
 
 		email := html.EscapeString(r.Form.Get("email"))
 		password := html.EscapeString(r.Form.Get("password"))
+
+		var fileUtil utils.Tools
+
+		fileUtil.AllowedFileTypes = []string{"image/png", "image/jpeg"}
+
+		file, err := fileUtil.UploadSingleFile(r, email, false)
+
+		if err != nil {
+			fmt.Println("Error: ", err)
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+
+		fmt.Println(file)
 
 		encrpytedPassword, err := bcrypt.GenerateFromPassword([]byte(password), 10)
 
@@ -245,6 +284,7 @@ func (m *Repository) Signup(w http.ResponseWriter, r *http.Request) {
 
 		u.Email = email
 		u.Password = encrpytedPassword
+		u.PathToAvatar = path.Join(fmt.Sprintf("%s%s", "./static/uploads", file.NewFileName))
 
 		_, err = u.InsertIntoDB(m.AppConfig.DB)
 
@@ -269,7 +309,7 @@ func (m *Repository) Signup(w http.ResponseWriter, r *http.Request) {
 
 		http.SetCookie(w, idCookie)
 
-		http.Redirect(w, r, "/admin/get-jwt", http.StatusSeeOther)
+		http.Redirect(w, r, "/admin/add-post", http.StatusSeeOther)
 	default:
 		fmt.Println("default")
 	}
@@ -370,6 +410,7 @@ func (m *Repository) GetListOfPosts(w http.ResponseWriter, r *http.Request) {
 		}
 
 		var authors []*models.Author
+		var avatars []template.HTML
 
 		for _, v := range posts {
 			a, err := utils.GetAuthor(m.AppConfig.DB, v.AuthorId)
@@ -379,12 +420,15 @@ func (m *Repository) GetListOfPosts(w http.ResponseWriter, r *http.Request) {
 				return
 			}
 			authors = append(authors, a)
+			avatar := template.HTML(fmt.Sprintf("%s", string(a.PathToAvatar)))
+			avatars = append(avatars, avatar)
 		}
 
 		data := make(map[string]interface{})
 
 		data["posts"] = posts
 		data["authors"] = authors
+		data["avatars"] = avatars
 
 		err = render.RenderTemplate(w, r, "list-posts.tmpl.html", &models.TemplateData{
 			Data: data,
@@ -469,6 +513,8 @@ func (m Repository) GetSinglePost(w http.ResponseWriter, r *http.Request) {
 	data["description"] = post.Description
 
 	data["post"] = post
+
+	data["avatar"] = author.PathToAvatar
 
 	html := template.HTML(fmt.Sprintf("%s", post.Content))
 

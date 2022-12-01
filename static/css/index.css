@@ -134,22 +134,33 @@ a.phone {
   display: grid;
   margin: auto;
   padding: 0 2.5%;
+  max-width: 100%;
 }
 
 .container {
   display: block;
-  max-width: 1500px;
+  max-width: 100%;
   margin: auto;
   width: 100%;
 }
 .container .row {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(275px, 1fr));
+  grid-template-columns: 1fr;
   margin-bottom: 1.5rem;
   padding: 0.25rem 0.33rem;
 }
+@media screen and (min-width: 968px) {
+  .container .row {
+    grid-template-columns: repeat(auto-fit, minmax(275px, 1fr));
+  }
+}
 .container .row.right-rail {
-  grid-template-columns: 3fr 1fr;
+  grid-template-columns: 1fr;
+}
+@media screen and (min-width: 968px) {
+  .container .row.right-rail {
+    grid-template-columns: 3fr 1fr;
+  }
 }
 
 .main-header {
@@ -166,6 +177,7 @@ a.phone {
 .card {
   border-bottom: 1px dashed #666;
   margin-bottom: 1.5em;
+  max-width: 100%;
 }
 
 @keyframes fadeOut {
@@ -223,6 +235,7 @@ span {
 
 p {
   margin-bottom: 1em;
+  max-width: 100%;
 }
 
 ul,
@@ -279,6 +292,14 @@ p {
   font-size: 1em;
   padding: 0.5rem 0rem;
   text-transform: uppercase;
+}
+
+.avatar {
+  height: 75px;
+  width: 75px;
+  border-radius: 50%;
+  margin: 0.5rem 1rem 0.5rem 0.5rem;
+  float: left;
 }
 
 .summary {

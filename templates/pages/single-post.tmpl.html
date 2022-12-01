@@ -10,9 +10,21 @@ My home Page
 
 {{ $author := .Data.author }}
 
+{{ $avatar := .Data.avatar }}
+
 {{ $htmlContent := index .Data.html }}
 
 {{ with index .Data "post"}}
+
+<div class="post-header">
+    <div class="container">
+        <div class="row">
+            <div class="col-9">
+                <img src="{{.FeaturedImage}}" alt="{{.Title }}">
+            </div>
+        </div>
+    </div>
+</div>
 
 <div class="card">
     <div class="card-header">
@@ -20,6 +32,7 @@ My home Page
         <time>{{ .PublishDate | humanDate }}</time>
         <time>{{ .UpdatedDate | humanDate }}</time>
         <div class="byline-wrapper">
+            <img src="{{- with $avatar -}} {{- . -}} {{- end -}}" alt="avatar" loading="lazy" decoding="async" height="50" width="50" class="avatar">
             <strong>BY: </strong><span class="byline">{{ $author.Email }}</span>
         </div>
         <p class="summary">{{ .Summary }}</p>

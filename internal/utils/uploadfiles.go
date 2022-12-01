@@ -7,6 +7,7 @@ import (
 	"io"
 	"net/http"
 	"os"
+	"path"
 	"path/filepath"
 	"strings"
 )
@@ -51,6 +52,39 @@ func (t *Tools) RandomString(n int) string {
 	return string(s)
 }
 
+func (t *Tools) CreateDirectoryIfNone(r *http.Request, dirname string) (string, error) {
+	const mode = 0655
+	if _, err := os.Stat(path.Join("./static/uploads/", dirname)); os.IsNotExist(err) {
+		err := os.MkdirAll(path.Join("./static/uploads/", dirname), 0655)
+
+		if err != nil {
+			return "", err
+		}
+
+	}
+	return path.Join("./static/uploads/", dirname), nil
+}
+
+func (t *Tools) UploadSingleFile(r *http.Request, uploadDir string, rename ...bool) (*UploadedFile, error) {
+
+	renameFile := true
+	if len(rename) > 0 {
+		renameFile = rename[0]
+	}
+
+	files, err := t.UploadFiles(r, uploadDir, renameFile)
+	if err != nil {
+		return nil, err
+	}
+
+	if len(files) > 0 {
+		return files[0], nil
+	} else {
+		return nil, err
+	}
+
+}
+
 func (t *Tools) UploadFiles(r *http.Request, uploadDir string, rename ...bool) ([]*UploadedFile, error) {
 	// handle whether or not we are going to rename the file
 	// variatic parameter rename
@@ -70,9 +104,17 @@ func (t *Tools) UploadFiles(r *http.Request, uploadDir string, rename ...bool) (
 		t.MaxFileSize = 1024 * 1024 * 1024
 	}
 
+	_, err := t.CreateDirectoryIfNone(r, uploadDir)
+
+	if err != nil {
+		return nil, err
+	}
+
 	// Parse the multipart form
 
-	err := r.ParseMultipartForm(int64(t.MaxFileSize))
+	err = r.ParseMultipartForm(int64(t.MaxFileSize))
+
+	fmt.Println(r.MultipartForm.File)
 
 	if err != nil {
 		return nil, errors.New("the uploaded file is too big")
@@ -127,10 +169,6 @@ func (t *Tools) UploadFiles(r *http.Request, uploadDir string, rename ...bool) (
 
 				fileType := http.DetectContentType(buff)
 
-				//	reset the file to the beginning of the file
-
-				_, err = infile.Seek(0, 0)
-
 				if err != nil {
 					return nil, err
 				}
@@ -165,6 +203,7 @@ func (t *Tools) UploadFiles(r *http.Request, uploadDir string, rename ...bool) (
 				} else {
 					uploadedFile.NewFileName = hdr.Filename
 				}
+				uploadedFile.OriginalFileName = hdr.Filename
 
 				// initiate the file that is going to be written to disk
 
@@ -173,8 +212,12 @@ func (t *Tools) UploadFiles(r *http.Request, uploadDir string, rename ...bool) (
 				//	defer closing the outfile until the function exits
 				defer outfile.Close()
 
+				//	reset the file to the beginning of the file
+
+				_, err = infile.Seek(0, 0)
+
 				//	handle joining the uploadDir and the filepath directory
-				if outfile, err = os.Create(filepath.Join(uploadDir, uploadedFile.NewFileName)); err != nil {
+				if outfile, err = os.Create(filepath.Join("./static/uploads/"+uploadDir, uploadedFile.NewFileName)); err != nil {
 					return nil, err
 				} else {
 					// get the filesize
