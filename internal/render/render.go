@@ -80,6 +80,12 @@ func AddDefaultTemplateData(r *http.Request) models.DefaultTemplateData {
 				Weight:            6,
 				HasAuthentication: true,
 			},
+			{
+				Name:              "Bulk Upload",
+				URL:               "/admin/bulk-upload",
+				Weight:            7,
+				HasAuthentication: true,
+			},
 		},
 		IsAuthenticated: app.IsAuthenticated(r),
 	}

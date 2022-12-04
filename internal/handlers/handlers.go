@@ -21,6 +21,7 @@ import (
 
 type Repository struct {
 	AppConfig *models.AppConfig
+	Tools     utils.Tools
 }
 
 var app *models.AppConfig
@@ -34,11 +35,13 @@ func NewHandlers(a *models.AppConfig) {
 func NewRepo(app *models.AppConfig) *Repository {
 	return &Repository{
 		AppConfig: app,
+		Tools:     utils.Tools{},
 	}
 }
 
 func SetRepo(m *Repository) {
 	Repo = m
+
 }
 
 func (m *Repository) Home(w http.ResponseWriter, r *http.Request) {
@@ -121,6 +124,25 @@ func (m *Repository) Logout(w http.ResponseWriter, r *http.Request) {
 
 	http.Redirect(w, r, "/admin/login", http.StatusSeeOther)
 	return
+}
+
+func (m *Repository) BulkUpload(w http.ResponseWriter, r *http.Request) {
+
+	switch r.Method {
+	case "GET":
+		// do something
+
+		var stringMap map[string]string
+
+		render.RenderTemplate(w, r, "bulk-upload.tmpl.html", &models.TemplateData{
+			StringMap: stringMap,
+		})
+	case "POST":
+		// do something
+	default:
+		http.Error(w, "Something Went Wrong", http.StatusInternalServerError)
+		return
+	}
 }
 
 func (m *Repository) AddPost(w http.ResponseWriter, r *http.Request) {

@@ -180,6 +180,13 @@ a.phone {
   max-width: 100%;
 }
 
+.featured-image {
+  aspect-ratio: 16/9;
+  max-width: 100%;
+  height: auto;
+  object-fit: cover;
+}
+
 @keyframes fadeOut {
   from {
     opacity: 1;
@@ -397,7 +404,7 @@ form.add-post .form-control textarea {
 }
 
 .d-none {
-  display: none;
+  display: none !important;
 }
 
 .fade-out {

@@ -41,6 +41,8 @@ func routes() http.Handler {
 	router.Handler(http.MethodGet, "/admin/add-post", protected.ThenFunc(handlers.Repo.AddPost))
 	router.Handler(http.MethodPost, "/admin/add-post", protected.ThenFunc(handlers.Repo.AddPost))
 	router.Handler(http.MethodPost, "/admin/get-jwt", dynamic.ThenFunc(handlers.Repo.GetJWT))
+	router.Handler(http.MethodGet, "/admin/bulk-upload", protected.ThenFunc(handlers.Repo.BulkUpload))
+	router.Handler(http.MethodPost, "/admin/bulk-upload", protected.ThenFunc(handlers.Repo.BulkUpload))
 
 	standard := alice.New(secureHeaders)
 
