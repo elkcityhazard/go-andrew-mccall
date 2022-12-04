@@ -173,7 +173,7 @@ func (m *Repository) AddPost(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		pathToImage, err := uploadTools.UploadSingleFile(r, &currentUser.Email, false)
+		pathToImage, err := uploadTools.UploadSingleFile(r, currentUser.Email, false)
 
 		if err != nil {
 			fmt.Println(err)
@@ -187,7 +187,9 @@ func (m *Repository) AddPost(w http.ResponseWriter, r *http.Request) {
 		p.Content = r.Form.Get("content")
 		p.Description = r.Form.Get("description")
 		p.Summary = r.Form.Get("summary")
-		p.FeaturedImage = pathToImage.NewFileName
+		p.FeaturedImage = path.Join("/static/uploads", pathToImage.NewFileName)
+
+		fmt.Println(p.FeaturedImage)
 
 		fmt.Println(r.Form.Get("publishDate"))
 

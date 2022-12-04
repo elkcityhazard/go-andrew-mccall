@@ -68,7 +68,7 @@ func (p *Post) InsertIntoDB(db *sql.DB, id string) (sql.Result, error) {
 				   VALUES(?,?,?,?,?,?,?,?,?);
 			`
 
-	res, err := db.Exec(stmt, p.Title, p.Description, p.Summary, p.PublishDate, time.Now(), p.ExpireDate, "", buf.String(), p.UserID)
+	res, err := db.Exec(stmt, p.Title, p.Description, p.Summary, p.PublishDate, time.Now(), p.ExpireDate, p.FeaturedImage, buf.String(), p.UserID)
 
 	if err != nil {
 		return nil, err
@@ -99,7 +99,7 @@ func (p *Post) GetSinglePost(db *sql.DB, id int) (*Post, error) {
 }
 
 func (p *Post) GetMultiplePosts(db *sql.DB) ([]*Post, error) {
-	stmt := `SELECT id, title, content, summary, author_id, created_at, updated_at, expires_at, featured_image FROM posts WHERE expires_at > UTC_TIMESTAMP() ORDER BY created_at DESC limit 10`
+	stmt := `SELECT id, title, content, summary, author_id, created_at, updated_at, expires_at, featured_image FROM posts WHERE expires_at > UTC_TIMESTAMP() ORDER BY created_at ASC limit 100`
 
 	rows, err := db.Query(stmt)
 
