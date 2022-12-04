@@ -77,6 +77,8 @@ func (t *Tools) UploadSingleFile(r *http.Request, uploadDir string, rename ...bo
 		return nil, err
 	}
 
+	fmt.Println(files)
+
 	if len(files) > 0 {
 		return files[0], nil
 	} else {
@@ -85,7 +87,7 @@ func (t *Tools) UploadSingleFile(r *http.Request, uploadDir string, rename ...bo
 
 }
 
-func (t *Tools) UploadFiles(r *http.Request, uploadDir string, rename ...bool) ([]*UploadedFile, error) {
+func (t *Tools) UploadFiles(r *http.Request, uploadDir string, rename ...bool) ([]UploadedFile, error) {
 	// handle whether or not we are going to rename the file
 	// variatic parameter rename
 
@@ -96,7 +98,7 @@ func (t *Tools) UploadFiles(r *http.Request, uploadDir string, rename ...bool) (
 	}
 
 	// uploadedFiles is what is going to be returned
-	var uploadedFiles []*UploadedFile
+	var uploadedFiles []UploadedFile
 
 	// set a sensible default if none is set
 
@@ -114,8 +116,6 @@ func (t *Tools) UploadFiles(r *http.Request, uploadDir string, rename ...bool) (
 
 	err = r.ParseMultipartForm(int64(t.MaxFileSize))
 
-	fmt.Println(r.MultipartForm.File)
-
 	if err != nil {
 		return nil, errors.New("the uploaded file is too big")
 	}
@@ -128,7 +128,7 @@ func (t *Tools) UploadFiles(r *http.Request, uploadDir string, rename ...bool) (
 	for _, fheaders := range r.MultipartForm.File {
 		for _, hdr := range fheaders {
 
-			uploadedFiles, err := func(uploadedFiles []*UploadedFile) ([]*UploadedFile, error) {
+			uploadedFiles, err := func(uploadedFiles []UploadedFile) ([]UploadedFile, error) {
 
 				//	have a place to store uploaded File
 				var uploadedFile UploadedFile
@@ -205,16 +205,16 @@ func (t *Tools) UploadFiles(r *http.Request, uploadDir string, rename ...bool) (
 				}
 				uploadedFile.OriginalFileName = hdr.Filename
 
+				//	reset the file to the beginning of the file
+
+				_, err = infile.Seek(0, 0)
+
 				// initiate the file that is going to be written to disk
 
 				var outfile *os.File
 
 				//	defer closing the outfile until the function exits
 				defer outfile.Close()
-
-				//	reset the file to the beginning of the file
-
-				_, err = infile.Seek(0, 0)
 
 				//	handle joining the uploadDir and the filepath directory
 				if outfile, err = os.Create(filepath.Join("./static/uploads/"+uploadDir, uploadedFile.NewFileName)); err != nil {
@@ -227,9 +227,10 @@ func (t *Tools) UploadFiles(r *http.Request, uploadDir string, rename ...bool) (
 						return nil, err
 					}
 					uploadedFile.FileSize = fileSize
+
 				}
 				// append teh current uploadedFile to the uploadedFiles slice
-				uploadedFiles = append(uploadedFiles, &uploadedFile)
+				uploadedFiles = append(uploadedFiles, *uploadedFile)
 
 				return uploadedFiles, nil
 			}(uploadedFiles)
@@ -239,5 +240,6 @@ func (t *Tools) UploadFiles(r *http.Request, uploadDir string, rename ...bool) (
 
 		}
 	}
+
 	return uploadedFiles, nil
 }

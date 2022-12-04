@@ -27,8 +27,6 @@ var app *models.AppConfig
 
 var Repo *Repository
 
-var uploadTools utils.Tools
-
 func NewHandlers(a *models.AppConfig) {
 	app = a
 }
@@ -146,12 +144,10 @@ func (m *Repository) AddPost(w http.ResponseWriter, r *http.Request) {
 			Data: data,
 		})
 	case "POST":
-		err := r.ParseMultipartForm(2 << 20)
+		var uploadTools utils.Tools
 
-		if err != nil {
-			http.Error(w, fmt.Sprintf("%s", err), http.StatusInternalServerError)
-			return
-		}
+		uploadTools.MaxFileSize = 2 << 20
+		uploadTools.AllowedFileTypes = []string{"image/jpeg", "image/jpg", "image/png"}
 
 		loggedIn := app.SessionManager.Exists(r.Context(), "authenticatedUserID")
 
@@ -176,10 +172,8 @@ func (m *Repository) AddPost(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
-		uploadTools.MaxFileSize = 2 << 20
-		uploadTools.AllowedFileTypes = []string{"image/jpeg", "image/jpg"}
 
-		pathToImage, err := uploadTools.UploadSingleFile(r, fmt.Sprintf("./uploads/%s", currentUser.Email), false)
+		pathToImage, err := uploadTools.UploadSingleFile(r, &currentUser.Email, false)
 
 		if err != nil {
 			fmt.Println(err)
@@ -193,7 +187,7 @@ func (m *Repository) AddPost(w http.ResponseWriter, r *http.Request) {
 		p.Content = r.Form.Get("content")
 		p.Description = r.Form.Get("description")
 		p.Summary = r.Form.Get("summary")
-		p.FeaturedImage = fmt.Sprintf("./uploads/%s%s", currentUser.Email, pathToImage.NewFileName)
+		p.FeaturedImage = pathToImage.NewFileName
 
 		fmt.Println(r.Form.Get("publishDate"))
 

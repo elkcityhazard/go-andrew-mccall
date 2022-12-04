@@ -24,5 +24,5 @@ func GetAuthor(db *sql.DB, id int) (*models.Author, error) {
 		}
 	}
 
-	return a, nil
+	return *a, nil
 }
