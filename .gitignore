@@ -1,3 +1,5 @@
 *.sql
 .env
 config.yaml
+./static/uploads
+
