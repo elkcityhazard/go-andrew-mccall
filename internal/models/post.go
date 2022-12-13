@@ -99,9 +99,41 @@ func (p *Post) GetSinglePost(db *sql.DB, id int) (*Post, error) {
 }
 
 func (p *Post) GetMultiplePosts(db *sql.DB) ([]*Post, error) {
-	stmt := `SELECT id, title, content, summary, author_id, created_at, updated_at, expires_at, featured_image FROM posts WHERE expires_at > UTC_TIMESTAMP() ORDER BY created_at ASC limit 100`
+	stmt := `SELECT id, title, content, summary, author_id, created_at, updated_at, expires_at, featured_image FROM posts WHERE expires_at > UTC_TIMESTAMP() ORDER BY created_at ASC limit 10`
 
 	rows, err := db.Query(stmt)
+
+	if err != nil {
+		return nil, err
+	}
+
+	defer rows.Close()
+
+	var posts []*Post
+
+	for rows.Next() {
+		cp := &Post{}
+
+		err := rows.Scan(&cp.Id, &cp.Title, &cp.Content, &cp.Summary, &cp.AuthorId, &cp.PublishDate, &cp.UpdatedDate, &cp.ExpireDate, &cp.FeaturedImage)
+
+		if err != nil {
+			return nil, err
+		}
+
+		posts = append(posts, cp)
+	}
+
+	if err = rows.Err(); err != nil {
+		return nil, err
+	}
+
+	return posts, nil
+}
+
+func (p *Post) GetPostWithLimitAndOffset(db *sql.DB, limit int, offset int) ([]*Post, error) {
+	stmt := `SELECT id, title, content, summary, author_id, created_at, updated_at, expires_at, featured_image FROM posts WHERE expires_at > UTC_TIMESTAMP() ORDER BY created_at ASC limit ? offset ?`
+
+	rows, err := db.Query(stmt, limit, offset)
 
 	if err != nil {
 		return nil, err

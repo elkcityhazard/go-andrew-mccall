@@ -2,13 +2,15 @@
 
 <header class="main-header">
     <div class="container">
-        <div class="row">
+        <div class="row two-col">
             <div class="col">
                 {{ with .Data }}
                     <h1>{{ .SiteTitle }}</h1>
                 {{ end }}
             </div>
-            <div class="col"></div>
+            <div class="col text-center">
+                <img src="/static/images/logos/palm-tree-sunset-500x500px.png" alt="brand image" height="500" width="500" class="brand-img" loading="lazy" decoding="async">
+            </div>
         </div>
     </div>
 </header>

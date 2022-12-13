@@ -46,9 +46,22 @@ func SetRepo(m *Repository) {
 
 func (m *Repository) Home(w http.ResponseWriter, r *http.Request) {
 
+	var post = models.Post{}
+
+	posts, err := post.GetPostWithLimitAndOffset(m.AppConfig.DB, 3, 0)
+
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
 	var data = make(map[string]interface{})
 
-	data["SiteTitle"] = "Andrew M McCall - Traverse City Web Design"
+	title := "Andrew M McCall - <br />Traverse City Web Design"
+
+	data["MostRecent"] = posts
+
+	data["SiteTitle"] = template.HTML(fmt.Sprintf("%s", title))
 
 	render.RenderTemplate(w, r, "home.tmpl.html", &models.TemplateData{
 		Data: data,
@@ -169,7 +182,7 @@ func (m *Repository) AddPost(w http.ResponseWriter, r *http.Request) {
 		var uploadTools utils.Tools
 
 		uploadTools.MaxFileSize = 2 << 20
-		uploadTools.AllowedFileTypes = []string{"image/jpeg", "image/jpg", "image/png"}
+		uploadTools.AllowedFileTypes = []string{"image/jpeg", "image/jpg", "image/png", "audio/mpeg"}
 
 		loggedIn := app.SessionManager.Exists(r.Context(), "authenticatedUserID")
 

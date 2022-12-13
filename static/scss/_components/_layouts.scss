@@ -1,9 +1,17 @@
-
 .wrapper {
   display: grid;
   margin: auto;
   padding: 0 2.5%;
   max-width: 100%;
+
+  &.home {
+    .container {
+      .row {
+        grid-template-columns: 100%;
+
+      }
+    }
+  }
 }
 
 
@@ -12,19 +20,25 @@
   max-width: 100%;
   margin: auto;
   width: 100%;
+
   .row {
     display: grid;
     grid-template-columns: 1fr;
+    height: 100%;
+
     @media screen and (min-width: 968px) {
       grid-template-columns: repeat(auto-fit, minmax(275px, 1fr));
     }
+
     margin-bottom: 1.5rem;
     padding: .25rem .33rem;
+
     &.right-rail {
       grid-template-columns: 1fr;
+
       @media screen and (min-width: 968px) {
         grid-template-columns: 3fr 1fr;
-        
+
       }
     }
   }
@@ -36,17 +50,61 @@
   display: grid;
   place-items: center;
   height: 100%;
+  grid-template-columns: 1fr;
+
+  .container {
+    .row {
+      &.two-col {
+        grid-template-columns: 1fr 1fr;
+        place-items: center;
+      }
+    }
+  }
 
 }
 
 .main-content {
- min-height: 75vh;
- max-width: 100%;
+  display: grid;
+  flex-flow: column nowrap;
+  max-width: 100%;
+
+  @media screen and (min-width: 968px) {
+    flex-flow: row wrap;
+  }
+
+  section {
+    .container {
+      .row {
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
+        flex-flow: column nowrap;
+        height: auto;
+
+        @media screen and (min-width: 968px) {
+          flex-flow: row wrap;
+        }
+      }
+    }
+  }
+
+  &.main-home {
+    width: 100%;
+  }
 }
 
-aside {
-  
+// Featured Post Partial
+
+.featured-posts {
+  background: #333;
+  color: #fff;
+
+  a {
+    color: #fff;
+  }
 }
+
+aside {}
 
 .card {
   border-bottom: 1px dashed #666;

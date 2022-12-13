@@ -1,0 +1,27 @@
+{{ define "featured-posts" }}
+
+<section class="featured-posts">
+    {{ block "FirstThree" . }}
+    <div class="container">
+        <div class="row">
+            {{ with .Data.MostRecent }}
+                {{ range . }}
+                    <div class="card">
+                        <div class="card-header">
+                            <h3>{{ .Title }}</h3>
+                        </div>
+                        <div class="card-body">
+                            {{ .Summary }}
+                        </div>
+                        <div class="card-footer">
+                            <a href="/posts/{{ .Id }}" class="btn">{{ .Title }}</a>
+                        </div>
+                    </div>
+                {{ end }}
+            {{ end }}
+        </div>
+    </div>
+{{ end }}
+</section>
+
+{{ end }}

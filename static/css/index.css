@@ -1,3 +1,10 @@
+.brand-img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 50%;
+  box-shadow: 0px 0px 0px 2px red, 0px 0px 0px 4px orange, 0px 0px 0px 8px indigo, 0px 0px 0px 12px crimson;
+}
+
 *,
 *::before,
 *::after {
@@ -9,6 +16,15 @@
 html,
 body {
   font-family: Arial;
+  height: 100%;
+}
+
+section,
+article {
+  height: 100%;
+  width: 100%;
+  margin: auto;
+  padding: 0.25em;
 }
 
 address {
@@ -136,6 +152,9 @@ a.phone {
   padding: 0 2.5%;
   max-width: 100%;
 }
+.wrapper.home .container .row {
+  grid-template-columns: 100%;
+}
 
 .container {
   display: block;
@@ -146,6 +165,7 @@ a.phone {
 .container .row {
   display: grid;
   grid-template-columns: 1fr;
+  height: 100%;
   margin-bottom: 1.5rem;
   padding: 0.25rem 0.33rem;
 }
@@ -167,11 +187,45 @@ a.phone {
   display: grid;
   place-items: center;
   height: 100%;
+  grid-template-columns: 1fr;
+}
+.main-header .container .row.two-col {
+  grid-template-columns: 1fr 1fr;
+  place-items: center;
 }
 
 .main-content {
-  min-height: 75vh;
+  display: grid;
+  flex-flow: column nowrap;
   max-width: 100%;
+}
+@media screen and (min-width: 968px) {
+  .main-content {
+    flex-flow: row wrap;
+  }
+}
+.main-content section .container .row {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  flex-flow: column nowrap;
+  height: auto;
+}
+@media screen and (min-width: 968px) {
+  .main-content section .container .row {
+    flex-flow: row wrap;
+  }
+}
+.main-content.main-home {
+  width: 100%;
+}
+
+.featured-posts {
+  background: #333;
+  color: #fff;
+}
+.featured-posts a {
+  color: #fff;
 }
 
 .card {
@@ -214,8 +268,10 @@ h4,
 h5,
 h6 {
   font-family: "DejaVu Sans", Verdana, Monospace;
+  margin: initial;
   margin-bottom: 1rem;
   text-transform: uppercase;
+  text-align: left;
 }
 
 a {
@@ -223,6 +279,22 @@ a {
   display: inline-block;
   margin-bottom: 1em;
   text-decoration: none;
+}
+a.btn {
+  -moz-transition: all 300ms ease;
+  -webkit-transition: all 300ms ease;
+  transition: all 300ms ease;
+  background: #333;
+  border: 1px solid #fff;
+  font-weight: 400;
+  margin: 0.33em 0;
+  padding: 3px 5px;
+  text-transform: uppercase;
+}
+a.btn:hover {
+  background: #fff;
+  border-color: indigo;
+  color: #333;
 }
 
 blockquote {
@@ -242,7 +314,8 @@ span {
 
 p {
   margin-bottom: 1em;
-  max-width: 100%;
+  max-width: 75ch;
+  width: 100%;
 }
 
 ul,

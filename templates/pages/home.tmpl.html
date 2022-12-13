@@ -1,4 +1,4 @@
-{{ template "base" .}}
+{{ template "home" .}}
 
 {{ define "title" }}
 
@@ -9,6 +9,9 @@ My home Page
 {{ define "Content"  }}
 
 {{template "home-header" . }}
+
+{{ template "featured-posts" . }}
+
 
 {{ end }}
 

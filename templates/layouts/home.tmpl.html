@@ -1,0 +1,51 @@
+{{ define "home" }}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    {{ with index .Data "description" }}
+    <meta name="description" content="{{ . }}">
+
+    {{ else }}
+    <meta name="description" content="I write about the internet, software, programming, seo, life, and how to better run your digital marketing for your business">
+    {{ end }}
+    <title>{{ template "title" . }}</title>
+    <link rel="stylesheet" href="/static/css/index.css">
+
+    {{ if .DefaultTemplateData.IsAuthenticated }}
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/simplemde/latest/simplemde.min.css">
+<script src="https://cdn.jsdelivr.net/simplemde/latest/simplemde.min.js"></script>
+    {{ end }}
+</head>
+<body>
+<div class="wrapper home">
+    <div class="container">
+        <div class="row">
+            {{ template "navigation" . }}
+        </div>
+        <div class="row right-rail">
+            <main class="main-content main-home">
+                {{ block "Flash" . }}
+                {{ with .DefaultTemplateData.FlashMessage }}
+                    <div class="row" style="background: red; color: #fff; text-transform: uppercase;">
+                        <div class="col text-center">
+                            <p id="flashMessage"> {{. }}</p>
+                        </div>
+                    </div>
+                {{ end }}
+                {{ end }}
+                {{ template "Content" . }}
+            </main>
+        </div>
+    </div>
+</div>
+{{ template "footer" . }}
+</body>
+</html>
+
+{{ end }}
+
+
