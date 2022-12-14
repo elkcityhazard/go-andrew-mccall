@@ -3,6 +3,7 @@ package models
 import (
 	"database/sql"
 	"fmt"
+	"path"
 )
 
 type User struct {
@@ -14,9 +15,7 @@ type User struct {
 
 func (u *User) InsertIntoDB(db *sql.DB) (sql.Result, error) {
 
-	fmt.Println(u.Email, u.Password)
-
-	stmt := `INSERT INTO users (email, path_to_avatar, password) VALUES(?,?, ?)`
+	stmt := `INSERT INTO users (email, path_to_avatar, password) VALUES(?,?,?)`
 
 	res, err := db.Exec(stmt, u.Email, u.PathToAvatar, u.Password)
 
@@ -44,4 +43,35 @@ func (u *User) GetUserByEmail(db *sql.DB, email string) (User, error) {
 	}
 
 	return newU, nil
+}
+
+func (u *User) GetUserById(db *sql.DB, id int) (User, error) {
+	stmt := `SELECT * FROM users WHERE id = ?`
+
+	newU := User{}
+
+	row := db.QueryRow(stmt, id)
+
+	err := row.Scan(&newU.Id, &newU.Email, &newU.Password, &newU.PathToAvatar)
+
+	if err != nil {
+		return newU, err
+	}
+
+	return newU, nil
+}
+
+func (u *User) UpdateUserAvatar(db *sql.DB, id int, file string) (sql.Result, error) {
+
+	stmt := `UPDATE users SET path_to_avatar = ? WHERE id = ?`
+
+	res, err := db.Exec(stmt, path.Join(fmt.Sprintf("%s%s", "./static/uploads", file)), id)
+
+	if err != nil {
+		fmt.Println("ERROR: ", err)
+		return nil, err
+
+	}
+
+	return res, nil
 }

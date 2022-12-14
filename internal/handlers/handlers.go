@@ -130,6 +130,94 @@ func (m *Repository) Login(w http.ResponseWriter, r *http.Request) {
 
 }
 
+func (m *Repository) UpdateAvatar(w http.ResponseWriter, r *http.Request) {
+
+	params := httprouter.ParamsFromContext(r.Context())
+
+	switch r.Method {
+
+	case "GET":
+		// Do something
+
+		exists := app.SessionManager.Exists(r.Context(), "authenticatedUserID")
+
+		if !exists {
+			http.Redirect(w, r, "/admin/login", http.StatusSeeOther)
+			return
+		}
+
+		id := app.SessionManager.GetString(r.Context(), "authenticatedUserID")
+
+		if id != params.ByName("id") {
+			http.Error(w, "authentication error", http.StatusUnauthorized)
+			return
+		}
+
+		stringMap := map[string]string{}
+
+		stringMap["ID"] = id
+
+		// render the template
+		render.RenderTemplate(w, r, "update-avatar.tmpl.html", &models.TemplateData{
+			StringMap: stringMap,
+		})
+
+	case "POST":
+
+		id := app.SessionManager.GetString(r.Context(), "authenticatedUserID")
+
+		user := models.User{}
+
+		toInt, err := strconv.Atoi(id)
+
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+
+		user, err = user.GetUserById(app.DB, toInt)
+
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+
+		fmt.Println(user)
+
+		// Do Something
+		m.Tools.MaxFileSize = 1024 * 1024 * 1024
+		file, err := m.Tools.UploadSingleFile(r, user.Email, false)
+
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+
+		app.SessionManager.Put(r.Context(), "flash", fmt.Sprintf("You uploaded %s to %s", file.NewFileName, user.PathToAvatar))
+
+		data := make(map[string]interface{})
+
+		data["file"] = file
+
+		result, err := user.UpdateUserAvatar(app.DB, toInt, file.NewFileName)
+
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+
+		data["result"] = result
+
+		render.RenderTemplate(w, r, "update-avatar.tmpl.html", &models.TemplateData{
+			Data: data,
+		})
+
+	default:
+		http.Error(w, "nothing to see here", http.StatusNotFound)
+		return
+	}
+}
+
 func (m *Repository) Logout(w http.ResponseWriter, r *http.Request) {
 	app.SessionManager.Remove(r.Context(), "authenticatedUserID")
 

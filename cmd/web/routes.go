@@ -35,6 +35,8 @@ func routes() http.Handler {
 
 	router.Handler(http.MethodGet, "/admin/signup", dynamic.ThenFunc(handlers.Repo.Signup))
 	router.Handler(http.MethodPost, "/admin/signup", dynamic.ThenFunc(handlers.Repo.Signup))
+	router.Handler(http.MethodGet, "/admin/user/:id/avatar", protected.ThenFunc(handlers.Repo.UpdateAvatar))
+	router.Handler(http.MethodPost, "/admin/user/:id/avatar", protected.ThenFunc(handlers.Repo.UpdateAvatar))
 	router.Handler(http.MethodGet, "/admin/login", dynamic.ThenFunc(handlers.Repo.Login))
 	router.Handler(http.MethodPost, "/admin/login", dynamic.ThenFunc(handlers.Repo.Login))
 	router.Handler(http.MethodGet, "/admin/logout", dynamic.ThenFunc(handlers.Repo.Logout))

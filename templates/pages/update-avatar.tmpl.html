@@ -1,0 +1,54 @@
+{{ template "base" . }}
+
+{{ define "title" }}
+Update Avatar
+{{ end }}
+
+{{ define "Content"  }}
+<div class="container">
+    <div class="row">
+        <div class="col">
+            <form action="/admin/user/{{.StringMap.ID}}/avatar" method="POST" class="avatar" enctype="multipart/form-data">
+                <div class="form-control d-none">
+                    <input type="hidden" name="csrf_token" value="{{ .DefaultTemplateData.CSRFToken }}">
+                </div>
+                <div class="form-control">
+                    <label for="avatar">Avatar: 
+                        <input type="file" name="avatar" id="avatar" width="200">
+                    </label>
+                </div>
+                <div class="form-control">
+                    <input type="submit" value="submit">
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{{ end }}
+
+{{ define "aside" }}
+
+{{$result := .Data.result}}
+
+
+{{ with .Data.file }}
+<section class="file=info">
+    <div class="container">
+        <div class="row">
+            <h3>File Info</h3>
+        </div>
+        <div class="row">
+            <div class="col">
+                <ul>
+                    <li>{{ .NewFileName }}</li>
+                    <li>{{ .OriginalFileName }}</li>
+                    <li>{{ .FileSize }}</li>
+                    <li>{{ $result }}</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</section>
+{{ end }}
+
+{{ end }}
