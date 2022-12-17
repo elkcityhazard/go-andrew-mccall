@@ -206,7 +206,7 @@ func (m *Repository) UpdateAvatar(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		err = m.Tools.ResizeImage(path.Join("./static/uploads", file.NewFileName), path.Join("./static/uploads", "resized"+file.NewFileName))
+		err = m.Tools.ResizeImage(path.Join("./static/uploads", user.PathToAvatar), path.Join("./static/uploads", "resized"+file.NewFileName), w, r, user.Email)
 
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)

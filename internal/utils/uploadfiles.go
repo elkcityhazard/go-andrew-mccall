@@ -55,7 +55,7 @@ func (t *Tools) RandomString(n int) string {
 func (t *Tools) CreateDirectoryIfNone(r *http.Request, dirname string) (string, error) {
 	const mode = 0655
 	if _, err := os.Stat(path.Join("./static/uploads/", dirname)); os.IsNotExist(err) {
-		err := os.MkdirAll(path.Join("./static/uploads/", dirname), 0655)
+		err := os.MkdirAll(path.Join("./static/uploads/", dirname), mode)
 
 		if err != nil {
 			return "", err

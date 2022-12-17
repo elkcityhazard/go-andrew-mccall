@@ -1,15 +1,27 @@
 package utils
 
 import (
-	"bytes"
+	"fmt"
 	"image"
 	"image/jpeg"
+	"net/http"
 	"os"
 
 	"golang.org/x/image/draw"
 )
 
-func (m *Tools) ResizeImage(currentImage, pathToNewFile string) error {
+func (m *Tools) ResizeImage(currentImage, pathToNewFile string, w http.ResponseWriter, r *http.Request, dirname string) error {
+
+	var t Tools
+
+	dir, err := t.CreateDirectoryIfNone(r, dirname)
+
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return err
+	}
+
+	fmt.Println(dir)
 
 	input, _ := os.Open(currentImage)
 	defer input.Close()
@@ -27,7 +39,7 @@ func (m *Tools) ResizeImage(currentImage, pathToNewFile string) error {
 	draw.NearestNeighbor.Scale(dst, dst.Rect, src, src.Bounds(), draw.Over, nil)
 
 	// Encode to `output`:
-	jpeg.Encode(bytes.NewReader(src), dst)
+	jpeg.Encode(output, dst, nil)
 
 	return nil
 }
