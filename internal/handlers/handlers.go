@@ -206,6 +206,13 @@ func (m *Repository) UpdateAvatar(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
+		err = m.Tools.ResizeImage(path.Join("./static/uploads", file.NewFileName), path.Join("./static/uploads", "resized"+file.NewFileName))
+
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+
 		data["result"] = result
 
 		render.RenderTemplate(w, r, "update-avatar.tmpl.html", &models.TemplateData{
