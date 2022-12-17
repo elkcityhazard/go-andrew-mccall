@@ -65,7 +65,7 @@ func (u *User) UpdateUserAvatar(db *sql.DB, id int, file string) (sql.Result, er
 
 	stmt := `UPDATE users SET path_to_avatar = ? WHERE id = ?`
 
-	res, err := db.Exec(stmt, path.Join(fmt.Sprintf("%s%s", "./static/uploads", file)), id)
+	res, err := db.Exec(stmt, path.Join(fmt.Sprintf("%s", file)), id)
 
 	if err != nil {
 		fmt.Println("ERROR: ", err)

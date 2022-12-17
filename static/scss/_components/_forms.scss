@@ -1,11 +1,21 @@
 @use './_mixins' as *;
 
 form {
+  display: block;
   max-width: 768px;
   margin: auto;
+  &.avatar {
+    border: 1px solid indigo;
+    border-radius: 0;
+    height: auto;
+    width: 100%;
+    margin: auto;
+    max-width: 768px;
+  }
 }
 
 form.login-form {
+  margin: auto;
   max-width: 275px;
 }
 
@@ -45,7 +55,7 @@ form.login-form * input[type="submit"] {
 
 label {
   &:focus-within {
-    color: transparent;
+    color: #777;
   }
 }
 

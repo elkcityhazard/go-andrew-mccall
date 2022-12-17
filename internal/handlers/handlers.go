@@ -186,6 +186,7 @@ func (m *Repository) UpdateAvatar(w http.ResponseWriter, r *http.Request) {
 
 		// Do Something
 		m.Tools.MaxFileSize = 1024 * 1024 * 1024
+		m.Tools.AllowedFileTypes = []string{"image/png", "image/jpeg", "image/jpg"}
 		file, err := m.Tools.UploadSingleFile(r, user.Email, false)
 
 		if err != nil {
@@ -206,7 +207,16 @@ func (m *Repository) UpdateAvatar(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		err = m.Tools.ResizeImage(path.Join("./static/uploads", user.PathToAvatar), path.Join("./static/uploads", "resized"+file.NewFileName), w, r, user.Email)
+		pathToUse := path.Join("./static/uploads/", file.NewFileName)
+
+		err = m.Tools.ResizeImage(file, pathToUse, &user, w, r)
+
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+
+		_, err = user.UpdateUserAvatar(app.DB, user.Id, pathToUse)
 
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)

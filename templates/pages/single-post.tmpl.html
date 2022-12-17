@@ -32,7 +32,7 @@ My home Page
         <time>{{ .PublishDate | humanDate }}</time>
         <time>{{ .UpdatedDate | humanDate }}</time>
         <div class="byline-wrapper">
-            <img src="{{- with $avatar -}} {{- . -}} {{- end -}}" alt="avatar" loading="lazy" decoding="async" height="50" width="50" class="avatar">
+            <img src="/{{- with $avatar -}} {{- . -}} {{- end -}}" alt="avatar" loading="lazy" decoding="async" height="50" width="50" class="avatar">
             <strong>BY: </strong><span class="byline">{{ $author.Email }}</span>
         </div>
         <p class="summary">{{ .Summary }}</p>

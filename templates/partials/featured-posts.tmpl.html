@@ -4,6 +4,11 @@
     {{ block "FirstThree" . }}
     <div class="container">
         <div class="row">
+            <div class="col-100">
+                <h2 class="text-center">Most Recent Articles</h2>
+            </div>
+        </div>
+        <div class="row">
             {{ with .Data.MostRecent }}
                 {{ range . }}
                     <div class="card">
