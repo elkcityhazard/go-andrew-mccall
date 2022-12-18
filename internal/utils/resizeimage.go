@@ -90,16 +90,20 @@ func (m *Tools) ResizeImage(file *UploadedFile, pathToFile string, user *models.
 
 	height := bounds.Dy()
 
+	fmt.Println(width, height)
+
 	// created the cropped size of the image
 
-	cropSize := image.Rect(0, 0, width/2, width/2)
+	cropSize := image.Rect(0, 0, width/2, height/2)
 
 	// dynamically get focal point based on original width
 
-	focalX := math.Floor(float64(width / 2))
-	focalY := math.Floor(float64(height / 2))
+	focalX := math.Floor(float64(width)) * 1.33
+	focalY := math.Floor(float64(height))
+	//focalY = 0
+	//focalX = float64(width)
 
-	//This is the place of the left and top padding of image that you want to crop. In this case we add padding left to 100 pixels and padding top of 80 pixel
+	//This is the place of the left and top padding of image that you want to crop. In this case we add padding left to width * 1.33 and padding top is the height of the destination image
 
 	cropSize = cropSize.Add(image.Point{int(focalX), int(focalY)})
 
