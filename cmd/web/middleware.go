@@ -14,7 +14,7 @@ func secureHeaders(next http.Handler) http.Handler {
 		// need to do this in your own code.
 		// w.Header().Set("Content-Type", "text/html")
 		w.Header().Set("Content-Security-Policy",
-			"default-src 'self' 'unsafe-inline'; style-src 'self' https://maxcdn.bootstrapcdn.com https://cdn.jsdelivr.net https://cdnjs.cloudflare.com fonts.googleapis.com; font-src https://maxcdn.bootstrapcdn.com fonts.gstatic.com; script-src 'unsafe-inline' https://cdn.jsdelivr.net;")
+			"default-src 'self' 'unsafe-inline'; style-src 'self' https://maxcdn.bootstrapcdn.com https://cdn.jsdelivr.net https://cdnjs.cloudflare.com fonts.googleapis.com; font-src 'self' https://maxcdn.bootstrapcdn.com fonts.gstatic.com; script-src 'unsafe-inline' https://cdn.jsdelivr.net;")
 
 		w.Header().Set("Referrer-Policy", "origin-when-cross-origin")
 		w.Header().Set("X-Content-Type-Options", "nosniff")

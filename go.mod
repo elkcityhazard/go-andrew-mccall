@@ -14,4 +14,7 @@ require (
 	golang.org/x/crypto v0.3.0
 )
 
-require golang.org/x/image v0.2.0 // indirect
+require (
+	github.com/disintegration/gift v1.2.1 // indirect
+	golang.org/x/image v0.2.0 // indirect
+)

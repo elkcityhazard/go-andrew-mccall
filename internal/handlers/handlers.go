@@ -3,8 +3,10 @@ package handlers
 import (
 	"errors"
 	"fmt"
+	"github.com/disintegration/gift"
 	"html"
 	"html/template"
+	"image"
 	"net/http"
 	"net/mail"
 	"path"
@@ -211,6 +213,14 @@ func (m *Repository) UpdateAvatar(w http.ResponseWriter, r *http.Request) {
 
 		err = m.Tools.ResizeImage(file, pathToUse, &user, w, r)
 
+		g := gift.New(
+			gift.CropToSize(100, 100 , 50)
+			)
+
+		newDst := image.NewRGBA(g.Bounds(file.Bounds()))
+
+		g.Draw(newDst, r.MultipartForm.Value("image"))
+
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
@@ -373,7 +383,7 @@ func (m *Repository) AddPost(w http.ResponseWriter, r *http.Request) {
 
 }
 
-//	Loging handles displaying the login page and posting the login
+//	Logging handles displaying the login page and posting the login
 
 func (m *Repository) Signup(w http.ResponseWriter, r *http.Request) {
 

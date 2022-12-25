@@ -2,23 +2,23 @@
 
 <section class="featured-posts">
     {{ block "FirstThree" . }}
-    <div class="container">
+    <div class="container-fluid">
         <div class="row">
-            <div class="col-100">
+            <div class="col-12 text-center mx-auto">
                 <h2 class="text-center">Most Recent Articles</h2>
             </div>
         </div>
         <div class="row">
             {{ with .Data.MostRecent }}
                 {{ range . }}
-                    <div class="card">
+                    <div class="card col-12 col-md-6 col-lg-4 col-xl-3 mb-3">
                         <div class="card-header">
                             <h3>{{ .Title }}</h3>
                         </div>
                         <div class="card-body">
                             {{ .Summary }}
                         </div>
-                        <div class="card-footer">
+                        <div class="card-footer mb-3">
                             <a href="/posts/{{ .Id }}" class="btn">{{ .Title }}</a>
                         </div>
                     </div>

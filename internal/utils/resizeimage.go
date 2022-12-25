@@ -125,7 +125,7 @@ func (m *Tools) ResizeImage(file *UploadedFile, pathToFile string, user *models.
 	}
 
 	// Resize:
-	draw.NearestNeighbor.Scale(dst, dst.Rect, src, src.Bounds(), draw.Over, nil)
+	draw.BiLinear.Scale(dst, dst.Rect, src, src.Bounds(), draw.Over, nil)
 
 	// Encode to `output`:
 
