@@ -3,10 +3,8 @@ package handlers
 import (
 	"errors"
 	"fmt"
-	"github.com/disintegration/gift"
 	"html"
 	"html/template"
-	"image"
 	"net/http"
 	"net/mail"
 	"path"
@@ -212,14 +210,6 @@ func (m *Repository) UpdateAvatar(w http.ResponseWriter, r *http.Request) {
 		pathToUse := path.Join("./static/uploads/", file.NewFileName)
 
 		err = m.Tools.ResizeImage(file, pathToUse, &user, w, r)
-
-		g := gift.New(
-			gift.CropToSize(100, 100 , 50)
-			)
-
-		newDst := image.NewRGBA(g.Bounds(file.Bounds()))
-
-		g.Draw(newDst, r.MultipartForm.Value("image"))
 
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)

@@ -99,7 +99,7 @@
 .featured-posts {
   background: #333;
   color: #fff;
-  padding-top: 1.5em;
+  padding: 1.5em 2em;
 
   a {
     color: #fff;
@@ -109,8 +109,9 @@
 aside {}
 
 .card {
-  border-bottom: 1px dashed #666;
+  border: 1px dashed #666;
   margin-bottom: 1.5em;
+  padding: 1.5em;
   max-width: 100%;
   .card-header {
     display: flex;

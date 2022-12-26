@@ -54,7 +54,7 @@ func (p *Post) InsertIntoDB(db *sql.DB, id string) (sql.Result, error) {
 		panic(err)
 	}
 
-	stmt := `INSERT INTO posts (
+	var stmt = `INSERT INTO posts (
 				   title,
                    description,
                    summary,
@@ -65,9 +65,7 @@ func (p *Post) InsertIntoDB(db *sql.DB, id string) (sql.Result, error) {
                    content, 
                    author_id
 				)
-				   VALUES(?,?,?,?,?,?,?,?,?);
-			`
-
+				   VALUES(?,?,?,?,?,?,?,?,?)`
 	res, err := db.Exec(stmt, p.Title, p.Description, p.Summary, p.PublishDate, time.Now(), p.ExpireDate, p.FeaturedImage, buf.String(), p.UserID)
 
 	if err != nil {
