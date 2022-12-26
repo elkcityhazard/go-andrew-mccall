@@ -19,6 +19,7 @@ type TemplateData struct {
 	StringMap           map[string]string
 	IntMap              map[string]string
 	Data                map[string]interface{}
+	Categories          []*Category
 	DefaultTemplateData DefaultTemplateData
 }
 

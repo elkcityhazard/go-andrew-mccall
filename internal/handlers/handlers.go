@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
 	"html"
@@ -329,7 +330,18 @@ func (m *Repository) AddPost(w http.ResponseWriter, r *http.Request) {
 		p.Summary = r.Form.Get("summary")
 		p.FeaturedImage = path.Join("/static/uploads", pathToImage.NewFileName)
 
-		fmt.Println(p.FeaturedImage)
+		var cat models.Category
+
+		cat.Name = r.Form.Get("category")
+
+		catRows, err := cat.CheckIfCategoryExistsAndReturn(app.DB, cat.Name)
+
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+
+		fmt.Println(catRows)
 
 		fmt.Println(r.Form.Get("publishDate"))
 
@@ -606,6 +618,21 @@ func (m *Repository) GetListOfPosts(w http.ResponseWriter, r *http.Request) {
 
 		data["author"] = author
 
+		// Category
+
+		c := models.Category{}
+
+		catSlice, err := c.GetCategoryByPostId(m.AppConfig.DB, idKey)
+
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+
+		fmt.Sprintf("%v", catSlice)
+
+		data["category"] = catSlice
+
 		render.RenderTemplate(w, r, "single-post.tmpl.html", &models.TemplateData{
 			Data: data,
 		})
@@ -613,7 +640,7 @@ func (m *Repository) GetListOfPosts(w http.ResponseWriter, r *http.Request) {
 
 }
 
-func (m Repository) GetSinglePost(w http.ResponseWriter, r *http.Request) {
+func (m *Repository) GetSinglePost(w http.ResponseWriter, r *http.Request) {
 	p := &models.Post{}
 
 	params := httprouter.ParamsFromContext(r.Context())
@@ -656,7 +683,109 @@ func (m Repository) GetSinglePost(w http.ResponseWriter, r *http.Request) {
 
 	data["html"] = html
 
+	// Category
+
+	var catSlice []*models.Category
+
+	c := models.Category{}
+
+	catSlice, err = c.GetCategoryByPostId(m.AppConfig.DB, 24)
+
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	fmt.Println("catSlice: ", catSlice[0])
+
 	render.RenderTemplate(w, r, "single-post.tmpl.html", &models.TemplateData{
-		Data: data,
+		Data:       data,
+		Categories: catSlice,
 	})
+}
+
+func (m *Repository) GetCategories(w http.ResponseWriter, r *http.Request) {
+
+	// getParams
+
+	qp := r.URL.Query()
+
+	// set up struct fields for json response
+
+	type Categories struct {
+		Categories []models.Category `json:"categories"`
+	}
+
+	// create a cat var
+
+	var cat *models.Category
+
+	// return category rows from database
+
+	cats, err := cat.CheckIfCategoryExistsAndReturn(m.AppConfig.DB, qp.Get("category"))
+
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	defer cats.Close()
+
+	// creat a slice to hold categories
+
+	var catArray []*models.Category
+
+	//	loop through categories and add them to the payload
+
+	for cats.Next() {
+		c := &models.Category{}
+
+		err = cats.Scan(&c.Id, &c.Name, &c.Slug, &c.PostId)
+
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		catArray = append(catArray, c)
+	}
+
+	if err = cats.Err(); err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	// set the content type header to send JSON correctly
+
+	w.Header().Set("Content-Type", "application/json")
+
+	// work some JSON magic
+
+	formattedPayload := map[string][]*models.Category{}
+
+	formattedPayload["categories"] = catArray
+
+	catPayload, err := json.Marshal(formattedPayload)
+
+	if err != nil {
+		type Error struct {
+			Status  int    `json:"status"`
+			Message string `json:"message"`
+		}
+
+		errMsg := Error{
+			Status:  500,
+			Message: err.Error(),
+		}
+
+		payload, err := json.Marshal(errMsg)
+
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+
+		w.Write(payload)
+	}
+
+	w.Write(catPayload)
 }

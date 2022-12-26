@@ -1,5 +1,6 @@
 {{ template "base" . }}
 
+
 {{ define "title" }}
 
 My home Page
@@ -14,7 +15,10 @@ My home Page
 
 {{ $htmlContent := index .Data.html }}
 
+{{ $categories := .Categories }}
+
 {{ with index .Data "post"}}
+
 
 <div class="post-header">
     <div class="container">
@@ -36,6 +40,12 @@ My home Page
                     <strong>By: </strong><span class="byline">{{ $author.Email }}</span>
                 </div>
                 <span><strong>Published: </strong></span><time>{{ .PublishDate | humanDate }}</time> | <span><strong>Updated: </strong></span><time>{{ .UpdatedDate | humanDate }}</time>
+            <div class="taxonomy-wrapper">
+                {{ with $categories }}
+                <span class="category"><strong>Category: </strong>{{range . }} <a href="/categories/{{ .Slug }}" title="{{ .Name }}" class="category">{{ .Name }}</a> {{ end }} </span>
+
+                {{ end }}
+            </div>
             </div>
         </div>
     </div>

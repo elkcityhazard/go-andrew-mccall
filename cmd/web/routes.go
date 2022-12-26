@@ -46,6 +46,9 @@ func routes() http.Handler {
 	router.Handler(http.MethodGet, "/admin/bulk-upload", protected.ThenFunc(handlers.Repo.BulkUpload))
 	router.Handler(http.MethodPost, "/admin/bulk-upload", protected.ThenFunc(handlers.Repo.BulkUpload))
 
+	// Categories
+	router.Handler(http.MethodGet, "/api/v1/categories", http.HandlerFunc(handlers.Repo.GetCategories))
+
 	standard := alice.New(secureHeaders)
 
 	return standard.Then(router)

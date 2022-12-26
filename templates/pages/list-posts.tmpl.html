@@ -12,6 +12,10 @@ My home Page
 
 {{ $avatars := .Data.avatars }}
 
+{{ $categories := .Data.categories }}
+
+{{ $categories }}
+
 {{ range $i,$v := .Data.posts }}
 
 <div class="card">
@@ -24,6 +28,12 @@ My home Page
                     <strong>By: </strong><span class="byline">{{ with index $authors $i }} {{ .Email }} {{ end }}</span>
                 </div>
                 <span><strong>Published: </strong></span><time>{{ $v.PublishDate | humanDate }}</time> | <span><strong>Updated: </strong></span><time>{{ $v.UpdatedDate | humanDate }}</time>
+            </div>
+            <div class="taxonomy-wrapper">
+                {{ if $categories }}
+                <span><strong>Category: </strong> {{ range $categories  }}  {{ . }} <a href="/categories/{{.Slug}}" title="{{ .Name }}">{{ .Name }}</a>  {{ end }}</span>
+}
+                {{ end }}
             </div>
         </div>
     </div>
