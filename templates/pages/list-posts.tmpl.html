@@ -12,9 +12,7 @@ My home Page
 
 {{ $avatars := .Data.avatars }}
 
-{{ $categories := .Data.categories }}
 
-{{ $categories }}
 
 {{ range $i,$v := .Data.posts }}
 
@@ -29,11 +27,9 @@ My home Page
                 </div>
                 <span><strong>Published: </strong></span><time>{{ $v.PublishDate | humanDate }}</time> | <span><strong>Updated: </strong></span><time>{{ $v.UpdatedDate | humanDate }}</time>
             </div>
-            <div class="taxonomy-wrapper">
-                {{ if $categories }}
-                <span><strong>Category: </strong> {{ range $categories  }}  {{ . }} <a href="/categories/{{.Slug}}" title="{{ .Name }}">{{ .Name }}</a>  {{ end }}</span>
-}
-                {{ end }}
+            <div class="taxonomy-wrapper w-100">
+                <strong>Category: </strong> <span class="category">{{ index $v.Categories 0}}</span>
+
             </div>
         </div>
     </div>

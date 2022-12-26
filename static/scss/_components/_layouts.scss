@@ -1,3 +1,4 @@
+@use "./_mixins.scss" as *;
 .wrapper {
   display: grid;
   margin: auto;
@@ -140,6 +141,24 @@ aside {}
       margin-right: auto;
       padding: 0.5em 0.65em;
       text-align: center;
+    }
+    a {
+      @include base-transition();
+      border: 1px solid indigo;
+      font-family: 'Fira Sans', Verdana, sans-serif, Ariel;
+      font-size: 1.25em;
+      font-weight: 800;
+      max-width: 275px;
+      padding: 0.5em 1em;
+      text-align: center;
+      text-transform: uppercase;
+      width: 100%;
+      &:hover,
+      &:active {
+        background: indigo;
+        color: #fff;
+        border-color: #fff;
+      }
     }
   }
 }

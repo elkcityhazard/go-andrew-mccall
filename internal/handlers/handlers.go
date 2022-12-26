@@ -563,6 +563,25 @@ func (m *Repository) GetListOfPosts(w http.ResponseWriter, r *http.Request) {
 		for _, v := range posts {
 			a, err := utils.GetAuthor(m.AppConfig.DB, v.AuthorId)
 
+			// Category
+
+			var catSlice []*models.Category
+
+			c := models.Category{}
+
+			catSlice, err = c.GetCategoryByPostId(m.AppConfig.DB, v.Id)
+
+			if err != nil {
+				http.Error(w, err.Error(), http.StatusInternalServerError)
+				return
+			}
+
+			catName := catSlice[0].Name
+
+			v.Categories = []string{}
+
+			v.Categories = append(v.Categories, catName)
+
 			if err != nil {
 				http.Error(w, err.Error(), http.StatusInternalServerError)
 				return
@@ -620,21 +639,22 @@ func (m *Repository) GetListOfPosts(w http.ResponseWriter, r *http.Request) {
 
 		// Category
 
+		var catSlice []*models.Category
+
 		c := models.Category{}
 
-		catSlice, err := c.GetCategoryByPostId(m.AppConfig.DB, idKey)
+		catSlice, err = c.GetCategoryByPostId(m.AppConfig.DB, 24)
 
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
 
-		fmt.Sprintf("%v", catSlice)
-
-		data["category"] = catSlice
+		fmt.Println("catSlice: ", catSlice[0])
 
 		render.RenderTemplate(w, r, "single-post.tmpl.html", &models.TemplateData{
-			Data: data,
+			Data:       data,
+			Categories: catSlice,
 		})
 	}
 
@@ -689,7 +709,7 @@ func (m *Repository) GetSinglePost(w http.ResponseWriter, r *http.Request) {
 
 	c := models.Category{}
 
-	catSlice, err = c.GetCategoryByPostId(m.AppConfig.DB, 24)
+	catSlice, err = c.GetCategoryByPostId(m.AppConfig.DB, postID)
 
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -698,9 +718,21 @@ func (m *Repository) GetSinglePost(w http.ResponseWriter, r *http.Request) {
 
 	fmt.Println("catSlice: ", catSlice[0])
 
+	//	Tags
+
+	var t *models.Tag
+
+	tags, err := t.GetTagById(m.AppConfig.DB, postID)
+
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
 	render.RenderTemplate(w, r, "single-post.tmpl.html", &models.TemplateData{
 		Data:       data,
 		Categories: catSlice,
+		Tags:       tags,
 	})
 }
 

@@ -50,10 +50,19 @@ func (c *Category) CreateNewCategory(db *sql.DB, name, slug string, postId int) 
 	return result, nil
 }
 
-func (c *Category) GetCategoryByPostId(db *sql.DB, id int) ([]*Category, error) {
-	stmt := `SELECT * FROM categories WHERE post_id = ?  ORDER BY 'asc'`
+func (c *Category) GetCategoryByPostId(db *sql.DB, id ...int) ([]*Category, error) {
 
-	rows, err := db.Query(stmt, id)
+	var stmt string
+
+	fmt.Println(len(id))
+
+	if id == nil {
+		stmt = `SELECT * FROM categories ORDER By 'asc'`
+	} else {
+		stmt = `SELECT * FROM categories WHERE post_id = ?  ORDER BY 'asc'`
+	}
+
+	rows, err := db.Query(stmt, id[0])
 
 	if err != nil {
 		return nil, err
@@ -83,4 +92,9 @@ func (c *Category) GetCategoryByPostId(db *sql.DB, id int) ([]*Category, error) 
 
 	return catSlice, nil
 
+}
+
+func (c *Category) GetPostsByCategoryId(db *sql.DB, categoryId int) ([]*models.Post, error) {
+
+	stmt := `SELECT * FROM POSTS`
 }

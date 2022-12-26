@@ -20,6 +20,7 @@ type TemplateData struct {
 	IntMap              map[string]string
 	Data                map[string]interface{}
 	Categories          []*Category
+	Tags                []*Tag
 	DefaultTemplateData DefaultTemplateData
 }
 

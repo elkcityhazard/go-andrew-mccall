@@ -17,6 +17,8 @@ My home Page
 
 {{ $categories := .Categories }}
 
+{{ $tags := .Tags }}
+
 {{ with index .Data "post"}}
 
 
@@ -39,11 +41,20 @@ My home Page
                 <div class="byline-wrapper">
                     <strong>By: </strong><span class="byline">{{ $author.Email }}</span>
                 </div>
-                <span><strong>Published: </strong></span><time>{{ .PublishDate | humanDate }}</time> | <span><strong>Updated: </strong></span><time>{{ .UpdatedDate | humanDate }}</time>
+                <div class="meta-wrapper">
+                    <span><strong>Published: </strong></span><time>{{ .PublishDate | humanDate }}</time> | <span><strong>Updated: </strong></span><time>{{ .UpdatedDate | humanDate }}</time>
+                </div>
             <div class="taxonomy-wrapper">
                 {{ with $categories }}
-                <span class="category"><strong>Category: </strong>{{range . }} <a href="/categories/{{ .Slug }}" title="{{ .Name }}" class="category">{{ .Name }}</a> {{ end }} </span>
-
+                <span><strong>Category: </strong>{{range . }} <a href="/categories/{{ .Slug }}" title="{{ .Name }}" class="category">{{ .Name }}</a> {{ end }} </span>
+                {{ end }}
+                {{ with $tags }}
+                <span><strong>Tags: </strong></span>
+                <ul class="tags">
+                    {{ range . }}
+                    <a href="/tags/{{ .Name }}" title="{{.Name }}" class="tag">{{ .Name }}</a>
+                    {{ end }}
+                </ul>
                 {{ end }}
             </div>
             </div>
