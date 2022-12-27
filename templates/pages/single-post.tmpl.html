@@ -74,5 +74,28 @@ My home Page
 {{ end }}
 
 {{ define "aside" }}
-This is the aside page
+
+{{ with .Data.relatedByCategory }}
+<section class="related-category-post">
+    <h3 class="mx-auto text-center my-3">Related By Category </h3>
+    <ul class="related-category-post__list-group">
+        {{ range . }}
+        <li class="related-category-post__list-item">
+            <div class="card">
+                <div class="card-header">
+                    <h3>{{.Title}}</h3>
+                </div>
+                <div class="card-body">
+                    <p>{{ .Summary }}</p>
+                </div>
+                <div class="card-footer">
+                    <a href="/posts/{{.Id}}">{{.Title}}</a>
+                </div>
+            </div>
+        </li>
+        {{ end }}
+    </ul>
+</section>
+
+{{ end }}
 {{ end }}

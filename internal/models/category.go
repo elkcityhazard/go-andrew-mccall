@@ -94,7 +94,33 @@ func (c *Category) GetCategoryByPostId(db *sql.DB, id ...int) ([]*Category, erro
 
 }
 
-func (c *Category) GetPostsByCategoryId(db *sql.DB, categoryId int) ([]*models.Post, error) {
+func (c *Category) GetPostsByCategoryId(db *sql.DB, categorySlug string) ([]*Post, error) {
 
-	stmt := `SELECT * FROM POSTS`
+	stmt := `SELECT posts.id, title, description, summary, author_id, created_at, updated_at, expires_at, featured_image, content, author_id FROM posts JOIN categories ON posts.id =  categories.post_id`
+
+	rows, err := db.Query(stmt)
+
+	if err != nil {
+		return nil, err
+	}
+
+	defer rows.Close()
+
+	posts := []*Post{}
+
+	for rows.Next() {
+		p := &Post{}
+
+		err = rows.Scan(&p.Id, &p.Title, &p.Description, &p.Summary, &p.AuthorId, &p.PublishDate, &p.UpdatedDate, &p.ExpireDate, &p.FeaturedImage, &p.Content, &p.UserID)
+
+		if err != nil {
+			return nil, err
+		}
+
+		posts = append(posts, p)
+	}
+	if err = rows.Err(); err != nil {
+		return nil, err
+	}
+	return posts, nil
 }

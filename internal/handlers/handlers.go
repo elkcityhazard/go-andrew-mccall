@@ -576,7 +576,13 @@ func (m *Repository) GetListOfPosts(w http.ResponseWriter, r *http.Request) {
 				return
 			}
 
-			catName := catSlice[0].Name
+			var catName string
+
+			if len(catSlice) > 0 {
+				catName = catSlice[0].Name
+			} else {
+				catName = "null"
+			}
 
 			v.Categories = []string{}
 
@@ -728,6 +734,21 @@ func (m *Repository) GetSinglePost(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
+
+	// Related By Category
+
+	var catPosts []*models.Post
+
+	catPosts, err = c.GetPostsByCategoryId(m.AppConfig.DB, catSlice[0].Slug)
+
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	data["relatedByCategory"] = catPosts
+
+	fmt.Println("related", data["relatedByCategory"])
 
 	render.RenderTemplate(w, r, "single-post.tmpl.html", &models.TemplateData{
 		Data:       data,
