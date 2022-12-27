@@ -19,6 +19,10 @@ My home Page
 
 {{ $tags := .Tags }}
 
+{{ $pageID := .Data.post.Id }}
+
+{{ $pageID}}
+
 {{ with index .Data "post"}}
 
 
@@ -75,11 +79,15 @@ My home Page
 
 {{ define "aside" }}
 
+{{ $pageID := .Data.post.Id }}
+
 {{ with .Data.relatedByCategory }}
 <section class="related-category-post">
     <h3 class="mx-auto text-center my-3">Related By Category </h3>
     <ul class="related-category-post__list-group">
         {{ range . }}
+
+        {{ if ne $pageID .Id }}
         <li class="related-category-post__list-item">
             <div class="card">
                 <div class="card-header">
@@ -93,6 +101,7 @@ My home Page
                 </div>
             </div>
         </li>
+        {{ end }}
         {{ end }}
     </ul>
 </section>
