@@ -231,6 +231,13 @@ a.phone {
   color: #fff;
 }
 
+aside {
+  display: block;
+}
+aside .related-category-post {
+  height: auto;
+}
+
 .card {
   border: 1px dashed #666;
   margin-bottom: 1.5em;

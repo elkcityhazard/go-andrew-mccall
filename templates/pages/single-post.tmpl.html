@@ -21,7 +21,7 @@ My home Page
 
 {{ $pageID := .Data.post.Id }}
 
-{{ $pageID}}
+{{ $relatedByTags := .Data.relatedByTags }}
 
 {{ with index .Data "post"}}
 
@@ -80,6 +80,7 @@ My home Page
 {{ define "aside" }}
 
 {{ $pageID := .Data.post.Id }}
+{{ $relatedByTags := .Data.relatedByTags }}
 
 {{ with .Data.relatedByCategory }}
 <section class="related-category-post">
@@ -105,6 +106,31 @@ My home Page
         {{ end }}
     </ul>
 </section>
+{{ end }}
 
+{{ with .Data.relatedByTags }}
+<section class="related-category-post">
+    <h3 class="mx-auto text-center my-3">Related By Tags </h3>
+    <ul class="related-category-post__list-group">
+        {{ range . }}
+
+        {{ if ne $pageID .Id }}
+        <li class="related-category-post__list-item">
+            <div class="card">
+                <div class="card-header">
+                    <h3>{{.Title}}</h3>
+                </div>
+                <div class="card-body">
+                    <p>{{ .Summary }}</p>
+                </div>
+                <div class="card-footer">
+                    <a href="/posts/{{.Id}}">{{.Title}}</a>
+                </div>
+            </div>
+        </li>
+        {{ end }}
+        {{ end }}
+    </ul>
+</section>
 {{ end }}
 {{ end }}

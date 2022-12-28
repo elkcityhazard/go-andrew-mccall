@@ -107,7 +107,12 @@
   }
 }
 
-aside {}
+aside {
+  display: block;
+  .related-category-post {
+    height: auto;
+  }
+}
 
 .card {
   border: 1px dashed #666;

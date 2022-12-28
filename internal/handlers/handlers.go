@@ -748,7 +748,33 @@ func (m *Repository) GetSinglePost(w http.ResponseWriter, r *http.Request) {
 
 	data["relatedByCategory"] = catPosts
 
-	fmt.Println("related", data["relatedByCategory"])
+	//	Tags
+
+	var relatedByTags []*models.Post
+
+	for _, v := range tags {
+		posts, err := v.GetPostsByTags(m.AppConfig.DB, v.Id)
+
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+
+		for _, w := range posts {
+			relatedByTags = append(relatedByTags, w)
+		}
+
+	}
+
+	reducedTags := map[string]*models.Post{}
+
+	for _, v := range relatedByTags {
+		if reducedTags[v.Title] == nil {
+			reducedTags[v.Title] = v
+		}
+	}
+
+	data["relatedByTags"] = reducedTags
 
 	render.RenderTemplate(w, r, "single-post.tmpl.html", &models.TemplateData{
 		Data:       data,
